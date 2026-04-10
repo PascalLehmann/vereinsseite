@@ -1,43 +1,66 @@
-<?php 
-ini_set('display_errors', 1); 
-error_reporting(E_ALL); 
-$pageTitle = "Unsere Spieler"; 
-$activePage = 'spieler.php'; // Für die Fokus-Logik im Menü
-include 'includes/header.php'; 
+<?php
+include_once 'db.php';
+$pageTitle = "Unsere Mannschaft";
+include_once 'includes/header.php';
+
+$mitglieder = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC")->fetchAll();
 ?>
 
 <div id="page-wrapper">
     <div class="container">
-        <?php include 'includes/nav.php'; ?>
+        <?php include_once 'includes/nav.php'; ?>
         
         <main class="content">
-            <h1>Unsere Mannschaft</h1>
-            <p>Die aktiven Mitglieder unseres Kaders.</p>
+            <h1>Unsere Spieler & Mitglieder</h1>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+                <?php foreach ($mitglieder as $m): ?>
+                <div class="news-card" style="text-align: center; position: relative;">
+                    <?php if($m['ist_gruendungsmitglied']): ?>
+                        <div style="position: absolute; top: 10px; right: 10px; background: var(--primary-orange); color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">
+                            GRÜNDER
+                        </div>
+                    <?php endif; ?>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 30px;">
-                
-                <?php 
-                // Simulation von 8 Spielern für Phase 1
-                $spielerNamen = ["Thomas Torjäger", "Lukas Läufer", "Markus Mauer", "Sven Stopper", "Finn Flanke", "Paul Pfosten", "Denni Dribbler", "Kevin Keeper"];
-                $positionen = ["Sturm", "Mittelfeld", "Abwehr", "Abwehr", "Mittelfeld", "Torwart", "Sturm", "Torwart"];
-                
-                for ($i = 0; $i < 8; $i++): 
-                ?>
-                <article class="news-card" style="text-align: center;">
-                    <div class="profile-preview-circle">
-                        <img src="https://via.placeholder.com/150" alt="Spieler Bild">
+<div class="profile-preview-circle" style="width: 150px; height: 150px; margin: 0 auto 20px;">
+    <?php if (!empty($m['profilbild'])): ?>
+        <img src="img/mitglieder/<?= htmlspecialchars($m['profilbild']) ?>" alt="<?= htmlspecialchars($m['vorname']) ?>">
+    <?php else: ?>
+        <img src="img/mitglieder/default-user.png" alt="Kein Bild vorhanden" style="opacity: 0.5; filter: grayscale(100%);">
+    <?php endif; ?>
+</div>
+
+                    <h2 style="color: var(--secondary-blue); margin-bottom: 5px;">
+                        <?= htmlspecialchars($m['vorname'] . " " . $m['nachname']) ?>
+                    </h2>
+                    
+                    <p style="color: #666; font-style: italic; margin-bottom: 20px;">
+                        <?= $m['im_vorstand'] ? htmlspecialchars($m['vorstands_rolle']) : 'Aktives Mitglied' ?>
+                    </p>
+
+                    <div style="background: #f4f7f6; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem;">
+                        <p><strong>Persönliche Bestwerte:</strong></p>
+                        <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>120 Würfe:</span>
+                            <strong><?= $m['best_120_wert'] ?: '-' ?> Holz</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>100 Würfe:</span>
+                            <strong><?= $m['best_100_wert'] ?: '-' ?> Holz</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>200 Würfe:</span>
+                            <strong><?= $m['best_200_wert'] ?: '-' ?> Holz</strong>
+                        </div>
+                        <p style="font-size: 0.7rem; color: #999; margin-top: 10px;">
+                            Dabei seit: <?= $m['eintrittsdatum'] ? date("d.m.Y", strtotime($m['eintrittsdatum'])) : 'Unbekannt' ?>
+                        </p>
                     </div>
-                    <h3 style="color: var(--secondary-blue);"><?php echo $spielerNamen[$i]; ?></h3>
-                    <p style="font-weight: bold; margin-bottom: 10px;"><?php echo $positionen[$i]; ?></p>
-                    <p style="font-size: 0.85rem; color: #777;">Spieler-ID: #<?php echo ($i + 10); ?></p>
-                    <a href="mitglied-details.php?id=<?php echo ($i + 10); ?>&typ=spieler" class="read-more">Statistik</a>
-                </article>
-                <?php endfor; ?>
-
+                </div>
+                <?php endforeach; ?>
             </div>
         </main>
     </div>
-    <?php include 'includes/footer.php'; ?>
+    <?php include_once 'includes/footer.php'; ?>
 </div>
-</body>
-</html>

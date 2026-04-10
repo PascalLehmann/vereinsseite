@@ -18,12 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$user]);
     $admin = $stmt->fetch();
 
-    if ($admin && password_verify($pass, $admin['password'])) {
-        $_SESSION['eingeloggt'] = true;
-        $_SESSION['user_id'] = $admin['id'];
-        header("Location: dashboard.php");
-        exit;
-    } else {
+if ($admin && password_verify($pass, $admin['password'])) {
+    $_SESSION['eingeloggt'] = true;
+    $_SESSION['user_id'] = $admin['id'];
+    
+    // Wir sind schon im admin-Ordner, also einfach:
+    header("Location: dashboard.php");
+    exit;
+} else {
         $error = "Ungültige Zugangsdaten!";
     }
 }
