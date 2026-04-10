@@ -46,7 +46,21 @@ body {
     border-radius: var(--border-radius);
     overflow: hidden; 
     position: relative;
+    border-bottom-right-radius: 50px; /* Die Rundung des weißen Feldes */
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+#page-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    right: 0;
+    height: 50px;
+    width: 50px;
+    background-color: transparent;
+    border-top-right-radius: 50px; /* Die Rundung nach oben */
+    box-shadow: 25px 0 0 0 var(--primary-orange); /* Füllt die Ecke orange */
+    pointer-events: none;
 }
 
 .container {
@@ -262,22 +276,14 @@ footer {
 
 /* --- 11. MOBILE OPTIMIERUNG --- */
 @media (min-width: 992px) {
-    .nav-toggle-label, .desktop-hide-title { display: none !important; }
-    
-    .sidebar {
-        position: fixed !important;
-        left: 0; top: 0; bottom: 0;
-        width: 300px;
-        z-index: 1000;
+    .nav-toggle-label, .desktop-hide-title {
+        display: none !important;
     }
-
-    /* Das sorgt dafür, dass die News-Seite (weiß) neben der Sidebar steht */
-    #page-wrapper, .container, main {
-        margin-left: 300px !important;
-        width: calc(100% - 300px) !important;
+    .nav-links {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
-
-    .nav-links { display: block !important; opacity: 1 !important; visibility: visible !important; }
 }
 
 .logout-link {
