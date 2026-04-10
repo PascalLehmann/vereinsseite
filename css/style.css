@@ -261,7 +261,7 @@ footer {
 }
 
 /* --- 11. MOBILE OPTIMIERUNG --- */
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
     body { height: auto; overflow: auto; padding: 0; }
     #page-wrapper { border-radius: 0; }
     .container { flex-direction: column; background-color: var(--primary-orange); }
@@ -280,6 +280,11 @@ footer {
     .nav-toggle:checked ~ .nav-links { display: flex; }
     
     .content { border-radius: 0; padding: 25px; height: auto; border: none; }
+}
+
+.logout-link {
+    color: #c0392b !important;
+    font-weight: bold;
 }
 
 /* --- 12. SPEZIAL-LOGIK --- */
