@@ -38,5 +38,18 @@ include 'includes/header.php';
             </form>
         </main>
     </div>
+<script>
+    // Sicherstellen, dass das Skript erst läuft, wenn alles geladen ist
+    window.addEventListener('load', function() {
+        if (typeof CKEDITOR !== 'undefined' && document.getElementById('news_inhalt')) {
+            CKEDITOR.replace('news_inhalt', {
+                versionCheck: false, // Versucht den Versions-Check zu deaktivieren
+                language: 'de',
+                height: 400,
+                allowedContent: true
+            });
+        }
+    });
+</script>
     <?php include 'includes/footer.php'; ?>
 </div>
