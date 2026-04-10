@@ -1,8 +1,8 @@
 <?php
-include_once '../auth.php'; // Eine Ebene hoch
+include_once '../auth.php'; 
 checkLogin();
-include_once '../../db.php'; // Zwei Ebenen hoch
-$pageTitle = "Gegner Übersicht";
+include_once '../../db.php';
+$pageTitle = "Gegner Verwaltung";
 include_once '../../includes/header.php';
 ?>
 
@@ -17,7 +17,7 @@ include_once '../../includes/header.php';
             </div>
 
             <div class="news-card" style="padding:0; overflow: hidden;">
-                <table style="width:100%; border-collapse:collapse;">
+                <table>
                     <thead>
                         <tr style="background:#f4f7f6;">
                             <th style="padding:15px; text-align:left;">Verein</th>
@@ -27,8 +27,7 @@ include_once '../../includes/header.php';
                     <tbody>
                         <?php 
                         $stmt = $pdo->query("SELECT * FROM gegner ORDER BY name ASC");
-                        while($g = $stmt->fetch()): 
-                        ?>
+                        while($g = $stmt->fetch()): ?>
                         <tr style="border-bottom:1px solid #eee;">
                             <td style="padding:15px;"><strong><?= htmlspecialchars($g['name']) ?></strong></td>
                             <td style="padding:15px; text-align:center;">
@@ -41,4 +40,4 @@ include_once '../../includes/header.php';
                 </table>
             </div>
         </main>
-    </div> </div> <?php include_once '../../includes/footer.php'; ?>
+    </div> <?php include_once '../../includes/footer.php'; ?> </div>

@@ -1,38 +1,52 @@
 <?php
-include_once 'auth.php';
+include_once '../auth.php';
 checkLogin();
-include '../db.php';
+include_once '../../db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = (int)$_POST['id'];
-    $titel = trim($_POST['titel']);
-    $inhalt = $_POST['inhalt'];
-
-    try {
-        // 1. Textdaten aktualisieren
-        $sql = "UPDATE news SET titel = ?, inhalt = ? WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$titel, $inhalt, $id]);
-
-        // 2. Neue Bilder hochladen (falls vorhanden)
-        if (!empty($_FILES['news_bilder']['name'][0])) {
-            $uploadDir = '../img/news/';
-            foreach ($_FILES['news_bilder']['tmp_name'] as $key => $tmp_name) {
-                if ($_FILES['news_bilder']['error'][$key] === 0) {
-                    $ext = pathinfo($_FILES['news_bilder']['name'][$key], PATHINFO_EXTENSION);
-                    $fileName = time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
-                    
-                    if (move_uploaded_file($tmp_name, $uploadDir . $fileName)) {
-                        $stmtB = $pdo->prepare("INSERT INTO news_bilder (news_id, bild_pfad) VALUES (?, ?)");
-                        $stmtB->execute([$id, $fileName]);
-                    }
-                }
-            }
-        }
-
-        header("Location: news-admin.php");
-        exit;
-    } catch (PDOException $e) {
-        die("Fehler beim Aktualisieren: " . $e->getMessage());
-    }
+$id = $_GET['id'] ?? null;
+$stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
+$stmt->execute([$id]);
+$n = $stmt->fetch();
+if (!$n) {
+    header("Location: übersicht.php");
+    exit;
 }
+
+$pageTitle = "News bearbeiten";
+include_once '../../includes/header.php';
+?>
+
+<div id="page-wrapper">
+    <div class="container">
+        <?php include_once '../../includes/nav.php'; ?>
+        <main class="content">
+            <h1>News bearbeiten</h1>
+            <form action="aktualisieren.php" method="POST" enctype="multipart/form-data" class="news-card">
+                <input type="hidden" name="id" value="<?= $n['id'] ?>">
+
+                <div style="margin-bottom:15px;">
+                    <label>Titel</label>
+                    <input type="text" name="titel" value="<?= htmlspecialchars($n['titel']) ?>" required>
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label>Inhalt</label>
+                    <textarea name="inhalt" required
+                        style="height: 200px;"><?= htmlspecialchars($n['inhalt']) ?></textarea>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label>Bild ändern (Optional)</label>
+                    <input type="file" name="bild">
+                    <?php if ($n['bild']): ?>
+                        <p><small>Aktuelles Bild: <?= $n['bild'] ?></small></p>
+                    <?php endif; ?>
+                </div>
+
+                <button type="submit" class="read-more">Speichern</button>
+                <a href="übersicht.php" style="margin-left:15px; color:gray;">Abbrechen</a>
+            </form>
+        </main>
+    </div>
+    <?php include_once '../../includes/footer.php'; ?>
+</div>
