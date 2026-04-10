@@ -11,7 +11,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <div class="nav-links">
         <div class="nav-section">
-            <h3 class="desktop-hide">Hauptmenü</h3>
             <ul>
                 <li><a href="/index.php"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="/news.php"><i class="fa-solid fa-newspaper"></i> News</a></li>

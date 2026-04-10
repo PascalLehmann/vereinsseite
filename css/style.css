@@ -48,18 +48,22 @@ body {
     position: relative;
     border-bottom-right-radius: 50px; /* Die Rundung des weißen Feldes */
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 1;
 }
 
+/* Die "magische" Ecke, die den Footer nach oben wölbt */
 #page-wrapper::after {
     content: "";
     position: absolute;
-    bottom: -50px;
+    bottom: -50px; /* Genau die Höhe der Rundung */
     right: 0;
     height: 50px;
     width: 50px;
     background-color: transparent;
-    border-top-right-radius: 50px; /* Die Rundung nach oben */
-    box-shadow: 25px 0 0 0 var(--primary-orange); /* Füllt die Ecke orange */
+    border-top-right-radius: 50px;
+    /* Ein Schatten, der die Farbe des Footers simuliert */
+    box-shadow: 25px 0 0 0 #ff8c00; 
+    z-index: 2;
     pointer-events: none;
 }
 
