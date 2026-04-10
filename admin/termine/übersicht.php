@@ -59,5 +59,5 @@ $termine = $stmt->fetchAll();
                     </tbody>
                 </table>
             </div>
-        </main>
+  </main>
     </div> </div> <?php include_once '../includes/footer.php'; ?>
