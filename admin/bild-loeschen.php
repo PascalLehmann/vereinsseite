@@ -1,5 +1,7 @@
 <?php
-include 'db.php';
+include_once 'auth.php';
+checkLogin();
+include '../db.php';
 
 $bild_id = (int)$_GET['bild_id'];
 $news_id = (int)$_GET['news_id'];

@@ -1,7 +1,7 @@
 <?php
 include_once 'auth.php';
 checkLogin();
-include 'db.php';
+include '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)$_POST['id'];
