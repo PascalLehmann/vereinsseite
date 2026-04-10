@@ -2,17 +2,10 @@
 include_once 'auth.php';
 checkLogin();
 include_once '../db.php';
-$pageTitle = "Gegner verwalten";
+$pageTitle = "Gegner-Verwaltung";
 include_once '../includes/header.php';
 
-// Gegner löschen Logik
-if (isset($_GET['delete'])) {
-    $stmt = $pdo->prepare("DELETE FROM gegner WHERE id = ?");
-    $stmt->execute([$_GET['delete']]);
-    header("Location: gegner-admin.php");
-}
-
-$gegner = $pdo->query("SELECT * FROM gegner ORDER BY name ASC")->fetchAll();
+// ... (Dein PHP Code zum Laden der Gegner) ...
 ?>
 
 <div id="page-wrapper">
@@ -20,50 +13,36 @@ $gegner = $pdo->query("SELECT * FROM gegner ORDER BY name ASC")->fetchAll();
         <?php include_once '../includes/nav.php'; ?>
         
         <main class="content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h1>Gegner-Verzeichnis</h1>
-                <button onclick="document.getElementById('add-gegner-form').style.display='block'" class="read-more">+ Gegner hinzufügen</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h1>Gegner-Verwaltung</h1>
+                <a href="gegner-create.php" class="read-more">Neuen Gegner anlegen</a>
             </div>
 
-            <div id="add-gegner-form" class="news-card" style="display:none; margin-bottom: 30px; background: #f9f9f9;">
-                <form action="gegner-save.php" method="POST">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <input type="text" name="name" placeholder="Vereinsname" required style="padding:10px;">
-                        <input type="text" name="strasse" placeholder="Straße & Hausnummer" style="padding:10px;">
-                        <input type="text" name="plz" placeholder="PLZ" style="padding:10px;">
-                        <input type="text" name="ort" placeholder="Ort" style="padding:10px;">
-                    </div>
-                    <button type="submit" class="read-more" style="margin-top:15px;">Speichern</button>
-                </form>
+            <div class="news-card" style="padding:0;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#f4f7f6;">
+                            <th style="padding:15px; text-align:left;">Name</th>
+                            <th style="padding:15px; text-align:left;">Adresse</th>
+                            <th style="padding:15px; text-align:center;">Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $stmt = $pdo->query("SELECT * FROM gegner ORDER BY name ASC");
+                        while($g = $stmt->fetch()): 
+                        ?>
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:15px;"><strong><?= htmlspecialchars($g['name']) ?></strong></td>
+                            <td style="padding:15px;"><?= htmlspecialchars($g['strasse'].", ".$g['plz']." ".$g['ort']) ?></td>
+                            <td style="padding:15px; text-align:center;">
+                                <a href="gegner-edit.php?id=<?= $g['id'] ?>" style="margin-right:10px;"><i class="fa-solid fa-pen"></i></a>
+                                <a href="gegner-delete.php?id=<?= $g['id'] ?>" style="color:red;" onclick="return confirm('Löschen?')"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Adresse</th>
-                        <th>Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($gegner as $g): ?>
-                    <tr>
-    <td><strong><?= htmlspecialchars($g['name']) ?></strong></td>
-    <td><?= htmlspecialchars($g['strasse'] . ", " . $g['plz'] . " " . $g['ort']) ?></td>
-    <td style="text-align: center;">
-        <a href="gegner-edit.php?id=<?= $g['id'] ?>" style="color: var(--secondary-blue); margin-right: 15px;">
-            <i class="fa-solid fa-pen-to-square"></i>
-        </a>
-        <a href="gegner-delete.php?id=<?= $g['id'] ?>" 
-           onclick="return confirm('Möchtest du diesen Gegner wirklich löschen?')" 
-           style="color: #e74c3c;">
-            <i class="fa-solid fa-trash"></i>
-        </a>
-    </td>
-</tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
         </main>
-    </div>
-</div>
+    </div> </div> <?php include_once '../includes/footer.php'; ?> 
