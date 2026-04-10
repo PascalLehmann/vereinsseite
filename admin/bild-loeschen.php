@@ -13,7 +13,7 @@ if ($bild_id > 0) {
     $bild = $stmt->fetch();
 
     if ($bild) {
-        $filePath = 'img/news/' . $bild['bild_pfad'];
+        $filePath = '../img/news/' . $bild['bild_pfad'];
         if (file_exists($filePath)) {
             unlink($filePath);
         }

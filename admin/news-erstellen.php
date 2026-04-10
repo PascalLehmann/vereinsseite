@@ -1,14 +1,14 @@
 <?php
 include_once 'auth.php';
 checkLogin();
-include 'db.php';
+include '../db.php';
 $pageTitle = "News schreiben - Admin";
-include 'includes/header.php';
+include '../includes/header.php';
 ?>
 
 <div id="page-wrapper">
     <div class="container">
-        <?php include 'includes/nav.php'; ?>
+        <?php include '../includes/nav.php'; ?>
         
         <main class="content">
             <a href="news.php" class="read-more" style="margin-bottom: 25px;">
@@ -53,5 +53,5 @@ include 'includes/header.php';
         }
     });
 </script>
-    <?php include 'includes/footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
 </div>

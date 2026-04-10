@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 2. Neue Bilder hochladen (falls vorhanden)
         if (!empty($_FILES['news_bilder']['name'][0])) {
-            $uploadDir = 'img/news/';
+            $uploadDir = '../img/news/';
             foreach ($_FILES['news_bilder']['tmp_name'] as $key => $tmp_name) {
                 if ($_FILES['news_bilder']['error'][$key] === 0) {
                     $ext = pathinfo($_FILES['news_bilder']['name'][$key], PATHINFO_EXTENSION);

@@ -1,9 +1,9 @@
 <?php
 include_once 'auth.php';
 checkLogin();
-include 'db.php';
+include '../db.php';
 $pageTitle = "News bearbeiten";
-include 'includes/header.php';
+include '../includes/header.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -25,7 +25,7 @@ $bilder = $stmtB->fetchAll();
 
 <div id="page-wrapper">
     <div class="container">
-        <?php include 'includes/nav.php'; ?>
+        <?php include '../includes/nav.php'; ?>
         
         <main class="content">
             <a href="news-admin.php" class="read-more" style="margin-bottom: 25px;">
@@ -55,7 +55,7 @@ $bilder = $stmtB->fetchAll();
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
                     <?php foreach ($bilder as $bild): ?>
                         <div style="position: relative; width: 120px;">
-                            <img src="img/news/<?= $bild['bild_pfad']; ?>" 
+                            <img src="../img/news/<?= $bild['bild_pfad']; ?>" 
                                  style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd;">
                             <a href="bild-loeschen.php?bild_id=<?= $bild['id']; ?>&news_id=<?= $id; ?>" 
                                style="position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; 
@@ -93,5 +93,5 @@ $bilder = $stmtB->fetchAll();
         });
     </script>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
 </div>

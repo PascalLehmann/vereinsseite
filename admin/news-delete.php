@@ -1,7 +1,7 @@
 <?php
 include_once 'auth.php';
 checkLogin();
-include 'db.php';
+include '../db.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -13,7 +13,7 @@ if ($id > 0) {
 
     // 2. Bilder physisch vom Server löschen
     foreach ($bilder as $bild) {
-        $filePath = 'img/news/' . $bild['bild_pfad'];
+        $filePath = '../img/news/' . $bild['bild_pfad'];
         if (file_exists($filePath)) {
             unlink($filePath);
         }

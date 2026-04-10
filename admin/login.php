@@ -6,7 +6,7 @@ $error = "";
 
 // Falls schon eingeloggt, direkt zum Admin-Bereich
 if (isset($_SESSION['eingeloggt']) && $_SESSION['eingeloggt'] === true) {
-    header("Location: news-admin.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($admin && password_verify($pass, $admin['password'])) {
         $_SESSION['eingeloggt'] = true;
         $_SESSION['user_id'] = $admin['id'];
-        header("Location: news-admin.php");
+        header("Location: dashboard.php");
         exit;
     } else {
         $error = "Ungültige Zugangsdaten!";

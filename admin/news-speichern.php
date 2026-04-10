@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // 2. Multi-Bilder-Upload verarbeiten
             if (!empty($_FILES['news_bilder']['name'][0])) {
-                $uploadDir = 'img/news/';
+                $uploadDir = '../img/news/';
                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
                 foreach ($_FILES['news_bilder']['tmp_name'] as $key => $tmp_name) {
