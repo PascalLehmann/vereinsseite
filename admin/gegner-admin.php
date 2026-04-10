@@ -48,12 +48,19 @@ $gegner = $pdo->query("SELECT * FROM gegner ORDER BY name ASC")->fetchAll();
                 <tbody>
                     <?php foreach ($gegner as $g): ?>
                     <tr>
-                        <td><strong><?= htmlspecialchars($g['name']) ?></strong></td>
-                        <td><?= htmlspecialchars($g['strasse'] . ", " . $g['plz'] . " " . $g['ort']) ?></td>
-                        <td>
-                            <a href="?delete=<?= $g['id'] ?>" onclick="return confirm('Gegner wirklich löschen?')" style="color:red;"><i class="fa-solid fa-trash"></i></a>
-                        </td>
-                    </tr>
+    <td><strong><?= htmlspecialchars($g['name']) ?></strong></td>
+    <td><?= htmlspecialchars($g['strasse'] . ", " . $g['plz'] . " " . $g['ort']) ?></td>
+    <td style="text-align: center;">
+        <a href="gegner-edit.php?id=<?= $g['id'] ?>" style="color: var(--secondary-blue); margin-right: 15px;">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <a href="gegner-delete.php?id=<?= $g['id'] ?>" 
+           onclick="return confirm('Möchtest du diesen Gegner wirklich löschen?')" 
+           style="color: #e74c3c;">
+            <i class="fa-solid fa-trash"></i>
+        </a>
+    </td>
+</tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>

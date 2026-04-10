@@ -1,0 +1,35 @@
+<?php
+include_once 'auth.php';
+checkLogin();
+include_once '../db.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sql = "UPDATE termine SET 
+        typ = ?, termin_datum = ?, uhrzeit = ?, titel = ?, beschreibung = ?, ort = ?, 
+        gegner_id = ?, heimspiel = ?, treffpunkt_zeit = ?, spielfuehrer_id = ?, 
+        s1 = ?, s2 = ?, s3 = ?, s4 = ?, s5 = ?, s6 = ?, a1 = ?, a2 = ?, a3 = ?
+        WHERE id = ?";
+
+    $stmt = $pdo->prepare($sql);
+    
+    $params = [
+        $_POST['typ'],
+        $_POST['termin_datum'],
+        $_POST['uhrzeit'],
+        $_POST['titel'] ?: null,
+        $_POST['beschreibung'] ?: null,
+        $_POST['ort'] ?: null,
+        $_POST['gegner_id'] ?: null,
+        $_POST['heimspiel'],
+        $_POST['treffpunkt_zeit'] ?: null,
+        $_POST['spielfuehrer_id'] ?: null,
+        $_POST['s1'] ?: null, $_POST['s2'] ?: null, $_POST['s3'] ?: null,
+        $_POST['s4'] ?: null, $_POST['s5'] ?: null, $_POST['s6'] ?: null,
+        $_POST['a1'] ?: null, $_POST['a2'] ?: null, $_POST['a3'] ?: null,
+        $_POST['id']
+    ];
+
+    $stmt->execute($params);
+    header("Location: termine-admin.php?updated=1");
+    exit;
+}
