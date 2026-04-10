@@ -3,11 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-<nav class="sidebar"> <div class="nav-links">
-        <a href="/index.php" class="nav-item <?= ($_SERVER['PHP_SELF'] == '/index.php' ? 'active' : '') ?>">
+<nav class="sidebar">
+    <div class="nav-links">
+        <a href="/index.php" class="nav-item">
             <i class="fa-solid fa-house"></i> Home
         </a>
-        <a href="/news.php" class="nav-item <?= ($_SERVER['PHP_SELF'] == '/news.php' ? 'active' : '') ?>">
+        <a href="/news.php" class="nav-item">
             <i class="fa-solid fa-newspaper"></i> News
         </a>
         <a href="/termine.php" class="nav-item">
@@ -29,7 +30,9 @@ if (session_status() === PHP_SESSION_NONE) {
         </a>
 
         <?php if (isset($_SESSION['eingeloggt']) && $_SESSION['eingeloggt'] === true): ?>
-            <div class="admin-nav-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="color:rgba(255,255,255,0.4); font-size:0.7rem; padding-left:20px; text-transform:uppercase;">Verwaltung</p>
+                
                 <a href="/admin/dashboard.php" class="nav-item" style="color: var(--primary-orange);">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
@@ -40,6 +43,10 @@ if (session_status() === PHP_SESSION_NONE) {
                     <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </a>
             </div>
+        <?php else: ?>
+            <a href="/admin/login.php" class="nav-item" style="margin-top: 50px; opacity: 0.2;">
+                <i class="fa-solid fa-lock"></i> Login
+            </a>
         <?php endif; ?>
     </div>
 </nav>
