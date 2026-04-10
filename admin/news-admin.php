@@ -1,7 +1,9 @@
 <?php
-include 'db.php';
+include_once 'auth.php';
+checkLogin();
+include '../db.php';
 $pageTitle = "News verwalten";
-include 'includes/header.php';
+include '../includes/header.php';
 
 $stmt = $pdo->query("SELECT * FROM news ORDER BY datum DESC");
 $newsList = $stmt->fetchAll();
@@ -9,7 +11,7 @@ $newsList = $stmt->fetchAll();
 
 <div id="page-wrapper">
     <div class="container">
-        <?php include 'includes/nav.php'; ?>
+        <?php include '../includes/nav.php'; ?>
         
         <main class="content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">

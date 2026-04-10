@@ -1,4 +1,6 @@
 <?php
+include_once 'auth.php';
+checkLogin();
 include 'db.php';
 $pageTitle = "News bearbeiten";
 include 'includes/header.php';

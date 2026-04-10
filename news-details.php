@@ -1,17 +1,28 @@
 <?php
-include 'db.php';
+// Nutze include_once, um Abstürze durch doppelte Einbindungen zu vermeiden
+include_once 'db.php';
 
-// 1. ID holen
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// 2. News laden
-$stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
-$stmt->execute([$id]);
-$news = $stmt->fetch();
-
-if (!$news) {
+// Prüfen, ob die ID gültig ist
+if ($id <= 0) {
     header("Location: news.php");
     exit;
+}
+
+try {
+    // News laden
+    $stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
+    $stmt->execute([$id]);
+    $news = $stmt->fetch();
+
+    if (!$news) {
+        header("Location: news.php");
+        exit;
+    }
+} catch (PDOException $e) {
+    // Falls die Tabelle nicht existiert oder die Verbindung hakt
+    die("Datenbankfehler: " . $e->getMessage());
 }
 
 $pageTitle = htmlspecialchars($news['titel']);
@@ -39,24 +50,30 @@ include 'includes/header.php';
                 </div>
 
                 <?php
-                $stmtB = $pdo->prepare("SELECT * FROM news_bilder WHERE news_id = ?");
-                $stmtB->execute([$id]);
-                $bilder = $stmtB->fetchAll();
+                // Bilderstrecke sicher laden
+                try {
+                    $stmtB = $pdo->prepare("SELECT * FROM news_bilder WHERE news_id = ?");
+                    $stmtB->execute([$id]);
+                    $bilder = $stmtB->fetchAll();
 
-                <?php if ($bilder): ?>
-    <h3>Bilderstrecke</h3>
-    <div class="photo-grid">
-        <?php foreach ($bilder as $bild): ?>
-            <div class="photo-card">
-                <div class="photo-box">
-                    <a href="javascript:void(0)" onclick="openLightbox('img/news/<?= $bild['bild_pfad']; ?>')">
-                        <img src="img/news/<?= $bild['bild_pfad']; ?>" alt="News Bild">
-                    </a>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+                    if ($bilder): ?>
+                        <h3>Bilderstrecke</h3>
+                        <div class="photo-grid">
+                            <?php foreach ($bilder as $bild): ?>
+                                <div class="photo-card">
+                                    <div class="photo-box">
+                                        <a href="javascript:void(0)" onclick="openLightbox('img/news/<?= $bild['bild_pfad']; ?>')">
+                                            <img src="img/news/<?= $bild['bild_pfad']; ?>" alt="News Bild">
+                                        </a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; 
+                } catch (PDOException $e) {
+                    echo "<p>Bildergalerie konnte nicht geladen werden.</p>";
+                }
+                ?>
             </article>
         </main>
     </div>

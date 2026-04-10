@@ -1,4 +1,6 @@
 <?php
+include_once 'auth.php';
+checkLogin();
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
