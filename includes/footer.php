@@ -6,5 +6,22 @@
             <a href="datenschutz.php">Datenschutz</a>
         </p>
     </footer>
+    <div id="lightbox-overlay" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Vergrößerte Ansicht">
+</div>
+
+<script>
+function openLightbox(src) {
+    const overlay = document.getElementById('lightbox-overlay');
+    const img = document.getElementById('lightbox-img');
+    img.src = src;
+    overlay.classList.add('active');
+}
+
+function closeLightbox() {
+    const overlay = document.getElementById('lightbox-overlay');
+    overlay.classList.remove('active');
+}
+</script>
 </body>
 </html>
