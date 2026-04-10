@@ -10,11 +10,17 @@ include 'includes/header.php';
     <div class="container">
         <?php include 'includes/nav.php'; ?>
         
-        <main class="content">
+ <main class="content">
     <h1>Aktuelle News</h1>
     
     <?php
-    $stmt = $pdo->query("SELECT * FROM news ORDER BY datum DESC");
+    // Wir holen alle News und verknüpfen sie (LEFT JOIN) mit dem jeweils ersten Bild aus news_bilder
+    $sql = "SELECT n.*, 
+            (SELECT bild_pfad FROM news_bilder WHERE news_id = n.id LIMIT 1) as vorschau_bild
+            FROM news n 
+            ORDER BY n.datum DESC";
+    
+    $stmt = $pdo->query($sql);
     while ($row = $stmt->fetch()):
         $date = date("d.m.Y", strtotime($row['datum']));
     ?>
@@ -23,14 +29,16 @@ include 'includes/header.php';
                 <div class="news-content-left">
                     <small><i class="fa-regular fa-clock"></i> <?= $date; ?></small>
                     <h2><?= htmlspecialchars($row['titel']); ?></h2>
-                    <p><?= mb_strimwidth(htmlspecialchars($row['inhalt']), 0, 120, "..."); ?></p>
+                    <p><?= mb_strimwidth(strip_tags($row['inhalt']), 0, 120, "..."); ?></p>
                 </div>
 
-                <?php if ($row['bild'] && $row['bild'] != 'default.jpg'): ?>
                 <div class="news-image-circle">
-                    <img src="img/news/<?= $row['bild']; ?>" alt="News Bild">
+                    <?php if ($row['vorschau_bild']): ?>
+                        <img src="img/news/<?= $row['vorschau_bild']; ?>" alt="News Bild">
+                    <?php else: ?>
+                        <img src="img/default_news.jpg" alt="Standard Bild">
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </article>
         </a>
     <?php endwhile; ?>
