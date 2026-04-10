@@ -16,7 +16,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 <li><a href="/index.php"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="/news.php"><i class="fa-solid fa-newspaper"></i> News</a></li>
                 <li><a href="/termine.php"><i class="fa-solid fa-calendar-days"></i> Termine</a></li>
-
                 <li>
                     <input type="checkbox" id="drop-mitglieder" class="drop-check">
                     <label for="drop-mitglieder" class="drop-label">
@@ -36,12 +35,14 @@ if (session_status() === PHP_SESSION_NONE) {
             <?php if (isset($_SESSION['admin_id'])): ?>
                 <h3>Verwaltung</h3>
                 <ul>
-                    <li><a href="/admin/dashboard.php">Dashboard</a></li>
-                    <li><a href="/admin/logout.php" class="logout-link">Logout</a></li>
+                    <li><a href="/admin/dashboard.php"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+                    <li><a href="/admin/news/uebersicht.php"><i class="fa-solid fa-pen-to-square"></i> News</a></li>
+                    <li><a href="/admin/logout.php" style="color: #ffcccc !important; font-weight:bold;"><i
+                                class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
                 </ul>
             <?php else: ?>
                 <ul>
-                    <li><a href="/admin/login.php">Admin Login</a></li>
+                    <li><a href="/admin/login.php"><i class="fa-solid fa-lock"></i> Admin Login</a></li>
                 </ul>
             <?php endif; ?>
         </div>

@@ -261,25 +261,23 @@ footer {
 }
 
 /* --- 11. MOBILE OPTIMIERUNG --- */
-@media (max-width: 992px) {
-    body { height: auto; overflow: auto; padding: 0; }
-    #page-wrapper { border-radius: 0; }
-    .container { flex-direction: column; background-color: var(--primary-orange); }
-    .sidebar { width: 100%; padding: 0; }
+@media (min-width: 992px) {
+    .nav-toggle-label, .desktop-hide-title { display: none !important; }
     
-    .nav-toggle-label {
-        display: block !important;
-        background: var(--primary-orange);
-        padding: 20px;
-        text-align: center;
-        font-weight: 800;
-        cursor: pointer;
+    .sidebar {
+        position: fixed !important;
+        left: 0; top: 0; bottom: 0;
+        width: 300px;
+        z-index: 1000;
     }
-    
-    .nav-links { display: none; }
-    .nav-toggle:checked ~ .nav-links { display: flex; }
-    
-    .content { border-radius: 0; padding: 25px; height: auto; border: none; }
+
+    /* Das sorgt dafür, dass die News-Seite (weiß) neben der Sidebar steht */
+    #page-wrapper, .container, main {
+        margin-left: 300px !important;
+        width: calc(100% - 300px) !important;
+    }
+
+    .nav-links { display: block !important; opacity: 1 !important; visibility: visible !important; }
 }
 
 .logout-link {
