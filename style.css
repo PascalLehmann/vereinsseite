@@ -308,3 +308,14 @@ footer {
     object-fit: cover; /* Verhindert Verzerrung */
     display: block;
 }
+
+/* --- 12. NEWS DETAILANSICHT --- */
+.news-detail-view {
+    max-width: 900px; /* Begrenzt die Textbreite für bessere Lesbarkeit auf großen Monitoren */
+    margin: 0 auto;   /* Zentriert den Artikel im Inhaltsbereich */
+}
+
+.news-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
