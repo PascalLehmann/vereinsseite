@@ -1,0 +1,15 @@
+# Verhindert, dass der Server Verzeichnisse auflistet
+Options -Indexes
+
+# Falls Rewrites genutzt werden (optional)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Hier keine Regeln, solange wir sie nicht brauchen
+</IfModule>
+
+# Zugriff auf Bilder explizit erlauben
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+</FilesMatch>

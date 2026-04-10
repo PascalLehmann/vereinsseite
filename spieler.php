@@ -22,12 +22,8 @@ $mitglieder = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC")->fet
                         </div>
                     <?php endif; ?>
 
-<div class="profile-preview-circle" style="width: 150px; height: 150px; margin: 0 auto 20px;">
-    <?php if (!empty($m['profilbild'])): ?>
-        <img src="img/mitglieder/<?= htmlspecialchars($m['profilbild']) ?>" alt="<?= htmlspecialchars($m['vorname']) ?>">
-    <?php else: ?>
-        <img src="img/mitglieder/default-user.png" alt="Kein Bild vorhanden" style="opacity: 0.5; filter: grayscale(100%);">
-    <?php endif; ?>
+<div class="profile-preview-circle">
+    <img src="<?= getProfilbild($m['profilbild']) ?>" alt="Profilbild">
 </div>
 
                     <h2 style="color: var(--secondary-blue); margin-bottom: 5px;">
