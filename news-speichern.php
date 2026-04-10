@@ -3,34 +3,36 @@ include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titel = trim($_POST['titel']);
-    $inhalt = trim($_POST['inhalt']);
-    $bildName = 'default.jpg'; // Standardbild, falls kein Upload erfolgt
+    $inhalt = $_POST['inhalt']; // Hier kein htmlspecialchars, da der Editor HTML erzeugt
 
-    // BILD-UPLOAD LOGIK
-    if (isset($_FILES['news_bild']) && $_FILES['news_bild']['error'] === 0) {
-        $uploadDir = 'img/news/'; // Ordner auf dem Server
-        
-        // Ordner erstellen, falls er nicht existiert
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        $fileExtension = pathinfo($_FILES['news_bild']['name'], PATHINFO_EXTENSION);
-        // Eindeutiger Name: Zeitstempel + Titel-Slug
-        $bildName = time() . "_" . bin2hex(random_bytes(4)) . "." . $fileExtension;
-        $uploadPath = $uploadDir . $bildName;
-
-        // Datei physisch verschieben
-        if (!move_uploaded_file($_FILES['news_bild']['tmp_name'], $uploadPath)) {
-            $bildName = 'default.jpg'; // Falls Upload fehlschlägt
-        }
-    }
-
-    if (!empty($titel) && !empty($inhalt)) {
+    if (!empty($titel)) {
         try {
-            $sql = "INSERT INTO news (titel, inhalt, bild, datum) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
+            // 1. News-Hauptdaten speichern
+            $sql = "INSERT INTO news (titel, inhalt, datum) VALUES (?, ?, CURRENT_TIMESTAMP)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$titel, $inhalt, $bildName]);
+            $stmt->execute([$titel, $inhalt]);
+            
+            $news_id = $pdo->lastInsertId();
+
+            // 2. Multi-Bilder-Upload verarbeiten
+            if (!empty($_FILES['news_bilder']['name'][0])) {
+                $uploadDir = 'img/news/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+                foreach ($_FILES['news_bilder']['tmp_name'] as $key => $tmp_name) {
+                    if ($_FILES['news_bilder']['error'][$key] === 0) {
+                        $ext = pathinfo($_FILES['news_bilder']['name'][$key], PATHINFO_EXTENSION);
+                        $fileName = time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
+                        $uploadPath = $uploadDir . $fileName;
+
+                        if (move_uploaded_file($tmp_name, $uploadPath)) {
+                            // Pfad in die neue Tabelle news_bilder eintragen
+                            $stmtB = $pdo->prepare("INSERT INTO news_bilder (news_id, bild_pfad) VALUES (?, ?)");
+                            $stmtB->execute([$news_id, $fileName]);
+                        }
+                    }
+                }
+            }
             
             header("Location: news.php");
             exit;

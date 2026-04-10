@@ -11,38 +11,30 @@ include 'includes/header.php';
         <?php include 'includes/nav.php'; ?>
         
         <main class="content">
-            <h1>Aktuelle News</h1>
-            
-            <?php
-            // 1. Abfrage an die Datenbank senden (Neueste zuerst)
-            $stmt = $pdo->query("SELECT * FROM news ORDER BY datum DESC");
-            $newsEntries = $stmt->fetchAll();
-
-            // 2. Prüfen, ob überhaupt News vorhanden sind
-            if ($newsEntries):
-                foreach ($newsEntries as $row): 
-                    // Datum für deutsche Anzeige formatieren
-                    $date = date("d.m.Y", strtotime($row['datum']));
-            ?>
-                
-<article class="news-card">
-    <?php if ($row['bild'] && $row['bild'] != 'default.jpg'): ?>
-        <div style="width:100%; height:200px; overflow:hidden; border-radius:15px; margin-bottom:15px;">
-            <img src="img/news/<?= $row['bild']; ?>" style="width:100%; height:100%; object-fit:cover;">
-        </div>
-    <?php endif; ?>
+    <h1>Aktuelle News</h1>
     
-    <small><i class="fa-regular fa-clock"></i> <?= $date; ?></small>
-    <h2><?= htmlspecialchars($row['titel']); ?></h2>
-    </article>
-            <?php 
-                endforeach; 
-            else: 
-            ?>
-                <p>Aktuell sind keine Neuigkeiten vorhanden.</p>
-            <?php endif; ?>
-            
-        </main>
+    <?php
+    $stmt = $pdo->query("SELECT * FROM news ORDER BY datum DESC");
+    while ($row = $stmt->fetch()):
+        $date = date("d.m.Y", strtotime($row['datum']));
+    ?>
+        <a href="news-details.php?id=<?= $row['id']; ?>" class="news-card-link">
+            <article class="news-card-flex">
+                <div class="news-content-left">
+                    <small><i class="fa-regular fa-clock"></i> <?= $date; ?></small>
+                    <h2><?= htmlspecialchars($row['titel']); ?></h2>
+                    <p><?= mb_strimwidth(htmlspecialchars($row['inhalt']), 0, 120, "..."); ?></p>
+                </div>
+
+                <?php if ($row['bild'] && $row['bild'] != 'default.jpg'): ?>
+                <div class="news-image-circle">
+                    <img src="img/news/<?= $row['bild']; ?>" alt="News Bild">
+                </div>
+                <?php endif; ?>
+            </article>
+        </a>
+    <?php endwhile; ?>
+</main>
     </div>
     <?php include 'includes/footer.php'; ?>
 </div>

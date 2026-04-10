@@ -15,30 +15,28 @@ include 'includes/header.php';
             
             <h1>Neue News verfassen</h1>
             
-            <form action="news-speichern.php" method="POST" class="news-card">
+            <form action="news-speichern.php" method="POST" enctype="multipart/form-data" class="news-card">
                 <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-weight:bold; margin-bottom:8px; color: var(--secondary-blue);">Titel der News</label>
-                    <input type="text" name="titel" required placeholder="Geben Sie eine Überschrift ein..." 
-                           style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; font-size:1rem; outline:none; focus:border-orange;">
+                    <label style="display:block; font-weight:bold; margin-bottom:8px;">Titel der News</label>
+                    <input type="text" name="titel" required style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
                 </div>
                 
                 <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-weight:bold; margin-bottom:8px; color: var(--secondary-blue);">Inhalt</label>
-                    <textarea name="inhalt" required rows="12" placeholder="Was gibt es Neues?" 
-                              style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; font-family:inherit; font-size:1rem; resize:vertical; outline:none;"></textarea>
+                    <label style="display:block; font-weight:bold; margin-bottom:8px;">Inhalt (mit Formatierung)</label>
+                    <textarea name="inhalt" id="news_inhalt" rows="15" style="width:100%;"></textarea>
                 </div>
-                <div style="margin-bottom: 20px;">
-        <label style="display:block; font-weight:bold; margin-bottom:8px; color: var(--secondary-blue);">Beitragsbild auswählen</label>
-        <input type="file" name="news_bild" accept="image/*" 
-               style="width:100%; padding:10px; border:1px dashed var(--primary-orange); border-radius:12px; background:#fff9f2;">
-        <small style="color: #666;">Empfohlen: Querformat (z.B. 800x600px)</small>
-    </div>
-                <button type="submit" class="read-more" 
-                        style="background: var(--primary-orange); color: white; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-paper-plane"></i> News veröffentlichen
+
+                <div style="margin-bottom: 25px; padding: 15px; background: #f9f9f9; border-radius: 12px; border: 1px dashed var(--primary-orange);">
+                    <label style="display:block; font-weight:bold; margin-bottom:8px;">Bilder hochladen (Mehrere möglich)</label>
+                    <input type="file" name="news_bilder[]" accept="image/*" multiple>
+                    <p style="font-size: 0.8rem; margin-top: 5px; color: #666;">Du kannst mehrere Bilder gleichzeitig auswählen.</p>
+                </div>
+                
+                <button type="submit" class="read-more" style="background: var(--primary-orange); color: white; border: none; cursor: pointer;">
+                    <i class="fa-solid fa-paper-plane"></i> News mit Bildern veröffentlichen
                 </button>
             </form>
-
         </main>
-    </div> <?php include 'includes/footer.php'; ?>
+    </div>
+    <?php include 'includes/footer.php'; ?>
 </div>
