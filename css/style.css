@@ -121,8 +121,13 @@ body {
     overflow-y: auto;
     height: 100%;
     min-width: 0;
+    /* PFEIL 2 FIX: Die Hohlkehle rechts unten */
+    /* Wir runden alle 3 Innenecken ab */
     border-top-left-radius: var(--border-radius);
     border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius); 
+       /* Wichtig: Oben rechts zum Rand eckig lassen */
+    border-top-right-radius: 0;
 }
 
 /* --- 6. KARTEN-SYSTEM & FORMULARE --- */
