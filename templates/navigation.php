@@ -13,22 +13,22 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="nav-section">
             <ul>
                 <li><a href="/index.php"><i class="fa-solid fa-house"></i> Home</a></li>
-                <li><a href="/news/news.php"><i class="fa-solid fa-newspaper"></i> News</a></li>
-                <li><a href="/spielbetrieb/termine.php"><i class="fa-solid fa-calendar-days"></i> Termine</a></li>
+                <li><a href="/pages/news.php"><i class="fa-solid fa-newspaper"></i> News</a></li>
+                <li><a href="/pages/termine.php"><i class="fa-solid fa-calendar-days"></i> Termine</a></li>
                 <li class="dropdown">
                     <input type="checkbox" id="drop-1" class="drop-check">
                     <label for="drop-1" class="drop-label <?= ($isMitgliederArea) ? 'active' : ''; ?>">
                         <i class="fa-solid fa-users"></i> Mitglieder ▼
                     </label>
                     <ul class="sub-menu">
-                        <li><a href="/verein/vorstand.php"
-                                class="<?= ($activePage == '/verein/vorstand.php') ? 'active' : ''; ?>">Vorstand</a>
+                        <li><a href="/pages/vorstand.php"
+                                class="<?= ($activePage == '/pages/vorstand.php') ? 'active' : ''; ?>">Vorstand</a>
                         </li>
-                        <li><a href="/verein/spieler.php"
-                                class="<?= ($activePage == 'spieler.php') ? 'active' : ''; ?>">Spieler</a></li>
+                        <li><a href="/pages/spieler.php"
+                                class="<?= ($activePage == '/pages/spieler.php') ? 'active' : ''; ?>">Spieler</a></li>
                     </ul>
                 </li>
-                <li><a href="/galerie/galerie.php"><i class="fa-solid fa-images"></i> Galerie</a></li>
+                <li><a href="/pages/galerie.php"><i class="fa-solid fa-images"></i> Galerie</a></li>
             </ul>
         </div>
 

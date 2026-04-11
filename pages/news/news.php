@@ -3,8 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 include '..db.php'; // Lädt deine Zugangsdaten und die PDO-Verbindung
 $pageTitle = "Aktuelle News";
-include '../includes/header.php';
-?>
+include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php'; ?>
 
 <div id="page-wrapper">
     <div class="container">
@@ -44,7 +43,8 @@ include '../includes/header.php';
             <?php endwhile; ?>
         </main>
     </div>
-    <?php include '../includes/footer.php'; ?>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
+
 </div>
 </body>
 
