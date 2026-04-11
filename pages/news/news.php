@@ -1,60 +1,66 @@
 <?php
-ini_set('display_errors', 1);
+session_start();
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// DB einbinden
-include $_SERVER['DOCUMENT_ROOT'] . '/db.php';
+// 1. DATENBANK EINBINDEN (Das ist der Fix für den Fehler!)
+// Wir gehen von pages/news/ zwei Ordner hoch ins Hauptverzeichnis zur db.php
+require_once __DIR__ . '/../../db.php';
 
-$pageTitle = "Aktuelle News";
-
-// Header lädt automatisch Navigation
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
+// 2. LAYOUT EINBINDEN
+require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
+<main>
+    <h2>Aktuelle News</h2>
 
-        <main class="content">
-            <h1>Aktuelle News</h1>
+    <?php
+    try {
+        // 1. Alle News abfragen (Jetzt mit den korrekten deutschen Spaltennamen!)
+        $sql = "SELECT id, titel, inhalt, erstellt_am FROM news ORDER BY erstellt_am DESC";
+        $stmt = $pdo->query($sql);
+        $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            <?php
-            // News + erstes Bild laden
-            $sql = "SELECT n.*, 
-                    (SELECT bild_pfad FROM news_bilder WHERE news_id = n.id LIMIT 1) AS vorschau_bild
-                    FROM news n 
-                    ORDER BY n.datum DESC";
+        // 2. Das Prepared Statement für die Bilder vorbereiten (Optimierung!)
+        // Das ist wie das Vorkompilieren einer Funktion. Wir rufen sie später im Loop nur noch auf.
+        $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :news_id";
+        $stmtBilder = $pdo->prepare($sqlBilder);
 
-            $stmt = $pdo->query($sql);
+        if (count($news_entries) > 0) {
+            foreach ($news_entries as $news) {
+                echo "<article class='news-item' style='margin-bottom: 40px;'>";
+                echo "<h3>" . htmlspecialchars($news['titel']) . "</h3>";
+                echo "<small style='color: #666;'>Veröffentlicht am: " . date('d.m.Y H:i', strtotime($news['erstellt_am'])) . "</small>";
+                echo "<p style='margin-top: 10px;'>" . nl2br(htmlspecialchars($news['inhalt'])) . "</p>";
 
-            while ($row = $stmt->fetch()):
-                $date = date("d.m.Y", strtotime($row['datum']));
-                ?>
+                // 3. Bilder für exakt diese News-ID abfragen
+                $stmtBilder->execute([':news_id' => $news['id']]);
+                // FETCH_COLUMN holt direkt ein flaches Array der Pfade (z.B. ['/uploads/a.jpg', '/uploads/b.png'])
+                $bilder = $stmtBilder->fetchAll(PDO::FETCH_COLUMN);
 
-                <a href="/pages/news/news-details.php?id=<?= $row['id']; ?>" class="news-card-link">
-                    <article class="news-card-flex">
+                // 4. Wenn Bilder existieren, als kleine Galerie ausgeben
+                if (count($bilder) > 0) {
+                    echo "<div class='news-gallery' style='display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;'>";
+                    foreach ($bilder as $pfad) {
+                        // WICHTIG: absolute Pfade nutzen!
+                        echo "<img src='" . htmlspecialchars($pfad) . "' alt='News Bild' style='max-width: 200px; border-radius: 8px; object-fit: cover;'>";
+                    }
+                    echo "</div>";
+                }
 
-                        <div class="news-content-left">
-                            <small><i class="fa-regular fa-clock"></i> <?= $date; ?></small>
-                            <h2><?= htmlspecialchars($row['titel']); ?></h2>
-                            <p><?= mb_strimwidth(strip_tags($row['inhalt']), 0, 120, "..."); ?></p>
-                        </div>
+                echo "</article><hr>";
+            }
+        } else {
+            echo "<p>Bisher gibt es noch keine Neuigkeiten.</p>";
+        }
 
-                        <div class="news-image-circle">
-                            <?php if ($row['vorschau_bild']): ?>
-                                <img src="/assets/img/news/<?= $row['vorschau_bild']; ?>" alt="News Bild">
-                            <?php else: ?>
-                                <img src="/assets/img/default_news.jpg" alt="Standard Bild">
-                            <?php endif; ?>
-                        </div>
+    } catch (PDOException $e) {
+        echo "<p style='color: red;'>Fehler beim Laden der News: " . $e->getMessage() . "</p>";
+    }
+    ?>
+</main>
 
-                    </article>
-                </a>
-
-            <?php endwhile; ?>
-
-        </main>
-
-    </div>
-
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-</div>
+<?php
+require_once __DIR__ . '/../../templates/footer.php';
+?>

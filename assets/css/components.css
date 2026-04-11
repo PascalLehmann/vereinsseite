@@ -1,73 +1,181 @@
 /* =========================================
-   MENÜ & LISTEN FORMATIERUNG
+   TYPOGRAFIE & GLOBALE ABSTÄNDE
    ========================================= */
-nav ul {
-    list-style-type: none; /* Entfernt die hässlichen Punkte */
-    padding: 0;
-    margin: 20px 0 0 0;
+main h2 {
+    margin-bottom: 25px; /* Erzwingt IMMER 25px Abstand unter der Überschrift */
+    /* Optional: Falls dir das Standard-Schwarz zu langweilig ist, 
+       kannst du hier auch color: var(--sidebar-color); nutzen! */
 }
 
-nav li {
-    margin-bottom: 5px;
-}
-
-nav a {
-    text-decoration: none; /* Entfernt die blauen Unterstriche */
-    color: var(--sidebar-text-color);
-    display: block;
-    padding: 12px 15px;
-    border-radius: 8px; /* Leichte Rundung für Menüpunkte beim Hovern */
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-nav a:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Hellerer Hintergrund beim Drüberfahren */
+/* Wir lagern auch die Abstände für die Button-Container aus */
+.action-bar {
+    margin-bottom: 25px;
 }
 
 /* =========================================
-   MOBILE LOGIK AUF DESKTOP VERSTECKEN
+   NAVIGATION LINKS
    ========================================= */
-input[type="checkbox"],
-label[for="menu-toggle"],
-.mobile-menu-icon {
-    display: none !important; /* Versteckt die Kästchen und Toggle-Buttons auf dem Desktop zwingend */
+.nav-links {
+    list-style: none;
+    margin-top: 20px;
 }
 
-/* Untermenü-Einrückung (z.B. für Vorstand, Spieler) */
-nav ul ul {
-    margin-top: 0;
-    margin-left: 20px; /* Rückt Untermenüs leicht nach rechts ein */
-}
-
-/* Styling für das native Dropdown */
+.nav-links a, 
 details.dropdown-menu summary {
+    text-decoration: none;
     color: var(--sidebar-text-color);
+    display: block;
     padding: 12px 15px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    list-style: none; /* Versteckt den Standard-Pfeil des Browsers */
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
-details.dropdown-menu summary::-webkit-details-marker {
-    display: none; /* Für Safari */
-}
-
+.nav-links a:hover, 
 details.dropdown-menu summary:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Natives Dropdown Styling */
+details.dropdown-menu summary {
+    list-style: none;
+}
+details.dropdown-menu summary::-webkit-details-marker {
+    display: none;
+}
 details.dropdown-menu ul {
+    list-style: none;
+    margin-left: 20px;
     margin-top: 5px;
-    margin-left: 20px; /* Einrückung der Unterpunkte */
 }
 
-/* Desktop: Verstecke mobile Elemente strikt! */
-/* Diese Klasse blendet Elemente auf Desktop-Bildschirmen rigoros aus */
-@media (min-width: 769px) {
-    .mobile-only {
-        display: none !important;
+/* =========================================
+   MOBILE MENÜ LOGIK (Checkbox Hack)
+   ========================================= */
+.mobile-only-checkbox { display: none; }
+.mobile-menu-btn {
+    display: none;
+    color: var(--sidebar-text-color);
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* Handy Ansicht */
+@media (max-width: 768px) {
+    .mobile-menu-btn { display: block; }
+    
+    /* Verstecke die Links standardmäßig auf Mobile */
+    .nav-links { display: none; margin-top: 10px; }
+    
+    /* Wenn Checkbox aktiv (Klick auf "MENÜ"), zeige die Links */
+    #mobile-menu-toggle:checked ~ .nav-links {
+        display: block;
     }
+}
+
+/* =========================================
+   ADMIN BEREICH: BUTTONS
+   ========================================= */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.btn-primary {
+    background-color: var(--sidebar-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    filter: brightness(0.9); /* Macht die Farbe beim Hovern minimal dunkler */
+}
+
+.btn-secondary {
+    background-color: #ffffff;               /* Weißer Hintergrund */
+    color: var(--sidebar-color);             /* Orangene Schrift */
+    border: 2px solid var(--sidebar-color);  /* Orangener Rahmen */
+    
+    /* Wichtig: Da wir jetzt 2px Rahmen haben, ziehen wir das vom Padding ab, 
+       damit der Button exakt so groß bleibt wie der Speichern-Button. */
+    padding: 8px 13px; 
+}
+
+/* Hover-Status: Komplett Orange, weiße Schrift */
+.btn-secondary:hover {
+    background-color: var(--sidebar-color);
+    color: #ffffff;
+}
+
+
+/* =========================================
+   ADMIN BEREICH: TABELLEN
+   ========================================= */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.admin-table th {
+    background-color: var(--sidebar-color);
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.admin-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.action-link { color: blue; margin-right: 10px; text-decoration: none; }
+.action-link:hover { text-decoration: underline; }
+.delete-link { color: red; text-decoration: none; }
+.delete-link:hover { text-decoration: underline; }
+
+/* =========================================
+   ADMIN BEREICH: FORMULARE
+   ========================================= */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+}
+
+.file-upload-box {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+}
+
+.alert-error {
+    color: red;
+    font-weight: bold;
+    padding: 10px;
+    border: 1px solid red;
+    background-color: #ffe6e6;
+    border-radius: 4px;
+    margin-bottom: 15px;
 }

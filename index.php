@@ -1,23 +1,23 @@
 <?php
-// Debug-Modus: Zeigt alle Fehler direkt im Browser an
-ini_set('display_errors', 1);
+session_start();
+// Fehlerberichterstattung für die Entwicklung
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$pageTitle = "Startseite - Mein Verein";
+// Header einbinden (Hier öffnet sich der <html> und <body> Tag)
+require_once __DIR__ . '/templates/header.php';
 
-// Header lädt automatisch Navigation
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
+// Navigation einbinden (Hier liegt dein <nav> Tag)
+require_once __DIR__ . '/templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
+<main>
+    <h2>Willkommen beim SKV9Killer</h2>
+    <p>Das Grundgerüst steht. Dies ist der Inhaltsbereich auf weißem Hintergrund mit schwarzer Schrift.</p>
 
-        <main class="content">
-            <h1>Willkommen beim SKV9Killer</h1>
-            <p>Das Grundgerüst steht. Dies ist der Inhaltsbereich auf weißem Hintergrund mit schwarzer Schrift.</p>
-        </main>
+</main>
 
-    </div>
-
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-</div>
+<?php
+// Footer einbinden (Hier liegt dein <footer> und </body> schließt sich)
+require_once __DIR__ . '/templates/footer.php';
+?>

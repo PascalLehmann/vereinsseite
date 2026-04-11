@@ -1,19 +1,19 @@
 :root {
-    --bg-color: #f4f4f5;         /* Hintergrund für den Hauptinhalt */
-    --element-color: #1a202c;    /* Farbe für Sidebar & Footer */
-    --text-light: #ffffff;
-    --text-dark: #333333;
-    --radius-size: 25px;         /* Globale Variable für unsere Rundungen */
+    --sidebar-color: #f97316;    
+    --sidebar-text-color: #0000ff; 
+    --content-bg: #ffffff;
+    --app-bg: #ffffff;           
+    --radius-size: 25px;         
 }
 
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Wichtig für C-Entwickler: sizeof() beinhaltet jetzt padding & border! */
 }
 
-body {
+html, body {
+    height: 100%;
     font-family: Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-dark);
+    background-color: var(--app-bg);
 }

@@ -3,42 +3,28 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-<nav class="sidebar">
-    <input type="checkbox" id="nav-toggle" class="nav-toggle">
-    <label for="menu-toggle" class="mobile-only">≡ MENÜ</label>
+<nav>
+    <input type="checkbox" id="mobile-menu-toggle" class="mobile-only-checkbox">
+    <label for="mobile-menu-toggle" class="mobile-menu-btn mobile-only">
+        <span class="hamburger-icon">≡ MENÜ</span>
+    </label>
 
-    <div class="nav-links">
-        <div class="nav-section">
-            <ul>
-                <li><a href="/index.php"><i class="fa-solid fa-house"></i> Home</a></li>
-                <li><a href="/pages/news/news.php"><i class="fa-solid fa-newspaper"></i> News</a></li>
-                <li><a href="/pages/termine/termine.php"><i class="fa-solid fa-calendar-days"></i> Termine</a></li>
-                <li>
-                    <details class="dropdown-menu">
-                        <summary><i class="fas fa-users"></i> Mitglieder ▼</summary>
-                        <ul>
-                            <li><a href="/pages/verein/vorstand.php">Vorstand</a></li>
-                            <li><a href="/pages/verein/spieler.php">Spieler</a></li>
-                        </ul>
-                    </details>
-                </li>
-                <li><a href="/pages/galerie/galerie.php"><i class="fa-solid fa-images"></i> Galerie</a></li>
-            </ul>
-        </div>
+    <ul class="nav-links">
+        <li><a href="/index.php">🏠 Home</a></li>
+        <li><a href="/pages/news/news.php">📰 News</a></li>
+        <li><a href="/pages/termine/termine.php">📅 Termine</a></li>
 
-        <div class="nav-section admin-nav">
-            <?php if (isset($_SESSION['admin_id'])): ?>
-                <h3 class="desktop-hide">Verwaltung</h3>
+        <li>
+            <details class="dropdown-menu">
+                <summary>👥 Mitglieder ▼</summary>
                 <ul>
-                    <li><a href="/pages/admin/dashboard.php"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
-                    <li><a href="/pages/admin/logout.php" style="color: #ffcccc !important;"><i
-                                class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                    <li><a href="/pages/verein/vorstand.php">Vorstand</a></li>
+                    <li><a href="/pages/verein/spieler.php">Spieler</a></li>
                 </ul>
-            <?php else: ?>
-                <ul>
-                    <li><a href="/pages/admin/login.php"><i class="fa-solid fa-lock"></i> Admin Login</a></li>
-                </ul>
-            <?php endif; ?>
-        </div>
-    </div>
+            </details>
+        </li>
+
+        <li><a href="/pages/galerie/galerie.php">🖼 Galerie</a></li>
+        <li><a href="/pages/admin/login.php">🔒 Admin Login</a></li>
+    </ul>
 </nav>
