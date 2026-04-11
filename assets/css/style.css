@@ -1,4 +1,4 @@
 /* assets/css/style.css */
-@import url('base.css');
-@import url('layout.css');
-@import url('components.css'); /* Hier kannst du später Button-Styles etc. auslagern */
+@import url('/assets/css/base.css');
+@import url('/assets/css/layout.css');
+@import url('/assets/css/components.css');

@@ -1,0 +1,75 @@
+/* =========================================
+   MENÜ & LISTEN FORMATIERUNG
+   ========================================= */
+nav ul {
+    list-style-type: none; /* Entfernt die hässlichen Punkte */
+    padding: 0;
+    margin: 20px 0 0 0;
+}
+
+nav li {
+    margin-bottom: 5px;
+}
+
+nav a {
+    text-decoration: none; /* Entfernt die blauen Unterstriche */
+    color: var(--sidebar-text-color);
+    display: block;
+    padding: 12px 15px;
+    border-radius: 8px; /* Leichte Rundung für Menüpunkte beim Hovern */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Hellerer Hintergrund beim Drüberfahren */
+}
+
+/* =========================================
+   MOBILE LOGIK AUF DESKTOP VERSTECKEN
+   ========================================= */
+input[type="checkbox"],
+label[for="menu-toggle"],
+.mobile-menu-icon {
+    display: none !important; /* Versteckt die Kästchen und Toggle-Buttons auf dem Desktop zwingend */
+}
+
+/* Untermenü-Einrückung (z.B. für Vorstand, Spieler) */
+nav ul ul {
+    margin-top: 0;
+    margin-left: 20px; /* Rückt Untermenüs leicht nach rechts ein */
+}
+
+/* Styling für das native Dropdown */
+details.dropdown-menu summary {
+    color: var(--sidebar-text-color);
+    padding: 12px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    list-style: none; /* Versteckt den Standard-Pfeil des Browsers */
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+details.dropdown-menu summary::-webkit-details-marker {
+    display: none; /* Für Safari */
+}
+
+details.dropdown-menu summary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+details.dropdown-menu ul {
+    margin-top: 5px;
+    margin-left: 20px; /* Einrückung der Unterpunkte */
+}
+
+/* Desktop: Verstecke mobile Elemente strikt! */
+@media (min-width: 769px) {
+    /* Setze hier die ID oder Klasse deiner Checkbox und des Labels ein */
+    #menu-toggle, 
+    .menu-btn, 
+    label[for="menu-toggle"] {
+        display: none !important;
+    }
+}
