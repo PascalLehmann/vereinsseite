@@ -23,46 +23,84 @@ function hatRolle($rolle, $rollen)
 {
     return in_array($rolle, $rollen);
 }
+
+// 4. Rollen in Session speichern (optional)
+$_SESSION['rollen'] = $rollen;
 ?>
 <!doctype html>
 <html lang="de">
 
 <head>
     <meta charset="utf-8">
-    <title>Admin-Dashboard</title>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>Willkommen, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
-
-    <p>Deine Rollen: <?php echo implode(", ", $rollen); ?></p>
+    <h1>Willkommen, <?= htmlspecialchars($_SESSION['username']) ?></h1>
+    <p>Deine Rollen: <strong><?= implode(", ", $rollen) ?></strong></p>
 
     <hr>
 
+    <!-- ADMIN-BEREICH -->
     <?php if (hatRolle('admin', $rollen)): ?>
-        <h2>Admin-Bereich</h2>
-        <ul>
-            <li><a href="user_anlegen.php">Neuen Benutzer anlegen</a></li>
-            <li><a href="rollen_vergeben.php">Rollen vergeben</a></li>
-            <li><a href="system_logs.php">System-Logs</a></li>
-        </ul>
+        <div class="box">
+            <h2>🔧 Admin-Bereich</h2>
+            <ul>
+                <li><a href="user_anlegen.php">Neuen Benutzer anlegen</a></li>
+                <li><a href="rollen.php">Rollenverwaltung</a></li>
+                <li><a href="rollen_vergeben_liste.php">Rollen an Benutzer vergeben</a></li>
+                <li><a href="system_logs.php">System-Logs</a></li>
+                <li><a href="einstellungen.php">System-Einstellungen</a></li>
+            </ul>
+        </div>
     <?php endif; ?>
 
+    <!-- AUTOR-BEREICH -->
     <?php if (hatRolle('autor', $rollen)): ?>
-        <h2>Autoren-Bereich</h2>
-        <ul>
-            <li><a href="beitrag_erstellen.php">Beitrag erstellen</a></li>
-            <li><a href="beitrag_verwalten.php">Beiträge verwalten</a></li>
-        </ul>
+        <div class="box">
+            <h2>✍️ Autoren-Bereich</h2>
+            <ul>
+                <li><a href="beitrag_erstellen.php">Beitrag erstellen</a></li>
+                <li><a href="beitrag_verwalten.php">Beiträge verwalten</a></li>
+                <li><a href="mediathek.php">Mediathek</a></li>
+            </ul>
+        </div>
     <?php endif; ?>
 
+    <!-- MITGLIEDER-BEREICH -->
     <?php if (hatRolle('mitglied', $rollen)): ?>
-        <h2>Mitglieder-Bereich</h2>
-        <ul>
-            <li><a href="profil.php">Mein Profil</a></li>
-            <li><a href="vereinsinfos.php">Vereinsinformationen</a></li>
-        </ul>
+        <div class="box">
+            <h2>👥 Mitglieder-Bereich</h2>
+            <ul>
+                <li><a href="profil.php">Mein Profil</a></li>
+                <li><a href="vereinsinfos.php">Vereinsinformationen</a></li>
+                <li><a href="termine.php">Termine & Veranstaltungen</a></li>
+                <li><a href="downloads.php">Downloads</a></li>
+            </ul>
+        </div>
     <?php endif; ?>
 
     <hr>
