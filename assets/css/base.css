@@ -1,0 +1,19 @@
+:root {
+    --bg-color: #f4f4f5;         /* Hintergrund für den Hauptinhalt */
+    --element-color: #1a202c;    /* Farbe für Sidebar & Footer */
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --radius-size: 25px;         /* Globale Variable für unsere Rundungen */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+}

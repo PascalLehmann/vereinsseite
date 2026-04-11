@@ -1,0 +1,69 @@
+/* Haupt-Layout als Grid */
+body {
+    display: grid;
+    grid-template-columns: 250px 1fr; /* 250px Sidebar, Rest ist Content */
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+}
+
+/* =========================================
+   SIDEBAR (Menüleiste)
+   ========================================= */
+nav {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3; /* Sidebar geht über Header und Content */
+    background-color: var(--element-color);
+    color: var(--text-light);
+    position: relative;
+    
+    /* Normale Rundung rechts oben */
+    border-top-right-radius: var(--radius-size);
+}
+
+/* INVERTED RADIUS: Sidebar rechts oben zum Content hin */
+nav::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: calc(var(--radius-size) * -1); /* Schiebt es rechts neben die Sidebar */
+    width: var(--radius-size);
+    height: var(--radius-size);
+    background-color: transparent;
+    border-top-left-radius: var(--radius-size);
+    /* Der Schatten erzeugt die Füllung in Sidebar-Farbe */
+    box-shadow: 0 calc(var(--radius-size) / -2) 0 0 var(--element-color);
+}
+
+main {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    padding: 30px;
+}
+
+/* =========================================
+   FOOTER
+   ========================================= */
+footer {
+    grid-column: 1 / span 2; /* Footer geht über die ganze Breite */
+    background-color: var(--element-color);
+    color: var(--text-light);
+    position: relative;
+    padding: 20px;
+    margin: 15px; /* Abstand zum Rand, damit die Rundungen wirken */
+    
+    /* Außenkanten des Footers komplett abrunden */
+    border-radius: var(--radius-size);
+}
+
+/* INVERTED RADIUS: Footer rechts oben zum Content hin */
+footer::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--radius-size) * -1); /* Schiebt es über den Footer */
+    right: 0;
+    width: var(--radius-size);
+    height: var(--radius-size);
+    background-color: transparent;
+    border-bottom-right-radius: var(--radius-size);
+    box-shadow: calc(var(--radius-size) / 2) 0 0 0 var(--element-color);
+}
