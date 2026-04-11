@@ -1,73 +1,54 @@
 <?php
+// 1. Session starten (muss zwingend ganz oben stehen!)
 session_start();
-require_once __DIR__ . '/../../db.php';
 
-// Login prüfen
-if (empty($_SESSION['user_id'])) {
-    header("Location: ../../login.php");
+// 2. Wächter (Guard Clause): Ist der User überhaupt eingeloggt?
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login.php");
     exit;
 }
 
-// Rollen laden
-$stmt = $pdo->prepare("
-    SELECT r.name 
-    FROM roles r
-    JOIN user_roles ur ON ur.role_id = r.id
-    WHERE ur.user_id = ?
-");
-$stmt->execute([$_SESSION['user_id']]);
-$rollen = $stmt->fetchAll(PDO::FETCH_COLUMN);
+// 3. Rollen-Check vorbereiten (macht den HTML-Teil unten viel lesbarer)
+// Wir prüfen, ob die Strings 'admin' oder 'autor' im Rollen-Array des Users existieren.
+$roles = $_SESSION['roles'] ?? []; // Fallback auf leeres Array, falls fehlerhaft
+$isAdmin = in_array('admin', $roles);
+$isAutor = in_array('autor', $roles);
 
-$_SESSION['rollen'] = $rollen;
-
-function hatRolle($rolle, $rollen)
-{
-    return in_array($rolle, $rollen);
-}
+// Header einbinden (absoluter Pfad auf dem Server)
+require_once __DIR__ . '/../../templates/header.php';
 ?>
-<!doctype html>
-<html lang="de">
 
-<head>
-    <meta charset="utf-8">
-    <title>Admin Dashboard</title>
-</head>
+<main class="dashboard-container">
+    <h2>Willkommen im Admin-Bereich, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
 
-<body>
-
-    <h1>Willkommen, <?= htmlspecialchars($_SESSION['username']) ?></h1>
-    <p>Rollen: <?= implode(", ", $rollen) ?></p>
+    <p>Deine aktuellen Rechte: <strong><?php echo htmlspecialchars(implode(', ', $roles)); ?></strong></p>
 
     <hr>
 
-    <?php if (hatRolle('admin', $rollen)): ?>
-        <h2>Admin-Bereich</h2>
-        <ul>
-            <li><a href="user_anlegen.php">Benutzer anlegen</a></li>
+    <h3>Aktionen</h3>
+    <ul class="admin-menu">
+
+        <?php
+        // --- CONTENT BEREICH ---
+        // Admin und Autor dürfen News und Termine verwalten
+        if ($isAdmin || $isAutor):
+            ?>
+            <li><a href="news/übersicht.php">News verwalten</a></li>
+            <li><a href="termine/übersicht.php">Termine verwalten</a></li>
+            <li><a href="gegner/übersicht.php">Gegner verwalten</a></li>
+        <?php endif; ?>
+
+        <?php
+        // --- SYSTEM BEREICH ---
+        // Nur der Admin darf Mitglieder und Rollen verwalten
+        if ($isAdmin):
+            ?>
+            <li><a href="mitglieder/übersicht.php">Mitgliederverwaltung</a></li>
             <li><a href="rollen.php">Rollenverwaltung</a></li>
-            <li><a href="rollen_vergeben_liste.php">Rollen an Benutzer vergeben</a></li>
-        </ul>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <?php if (hatRolle('autor', $rollen)): ?>
-        <h2>Autoren-Bereich</h2>
-        <ul>
-            <li><a href="#">Beitrag erstellen</a></li>
-            <li><a href="#">Beiträge verwalten</a></li>
-        </ul>
-    <?php endif; ?>
+        <li><a href="logout.php" style="color: red;">Ausloggen</a></li>
+    </ul>
+</main>
 
-    <?php if (hatRolle('mitglied', $rollen)): ?>
-        <h2>Mitglieder-Bereich</h2>
-        <ul>
-            <li><a href="#">Profil</a></li>
-            <li><a href="#">Vereinsinfos</a></li>
-        </ul>
-    <?php endif; ?>
-
-    <hr>
-    <a href="../../logout.php">Logout</a>
-
-</body>
-
-</html>
+<?php require_once __DIR__ . '/../../templates/footer.php'; ?>

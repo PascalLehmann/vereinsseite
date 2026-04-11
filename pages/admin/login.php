@@ -1,64 +1,38 @@
 <?php
+// 1. Session starten - IMMER als Erstes!
 session_start();
-require_once __DIR__ . '/db.php'; // stellt $pdo bereit
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    if ($username === '' || $password === '') {
-        $error = "Login fehlgeschlagen.";
-    } else {
-        // User anhand des Usernames holen
-        $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
-
-        // Prüfen: User existiert + Passwort korrekt?
-        if ($user && password_verify($password, $user['password'])) {
-
-            // Session härten
-            session_regenerate_id(true);
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['logged_in'] = true;
-
-            header("Location: admin/dashboard.php");
-            exit;
-        } else {
-            $error = "Login fehlgeschlagen.";
-        }
-    }
+// 2. Prüfen: Ist der User schon eingeloggt? (Wie ein Null-Pointer-Check)
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    header("Location: dashboard.php");
+    exit; // Wichtig: Code-Ausführung hier abbrechen!
 }
+
+// Header einbinden (mit absolutem Server-Pfad)
+require_once __DIR__ . '/../../templates/header.php';
 ?>
-<!doctype html>
-<html lang="de">
 
-<head>
-    <meta charset="utf-8">
-    <title>Login</title>
-</head>
+<main class="login-container">
+    <h2>Admin Login</h2>
 
-<body>
+    <?php
+    // Fehlermeldung anzeigen, falls auth.php uns mit einem Fehler zurückschickt
+    if (isset($_GET['error'])) {
+        echo '<p style="color: red;">Benutzername oder Passwort falsch!</p>';
+    }
+    ?>
 
-    <?php if (!empty($error)): ?>
-        <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-    <?php endif; ?>
-
-    <form method="post">
-        <label>Benutzername:
-            <input type="text" name="username" required>
-        </label><br>
-
-        <label>Passwort:
-            <input type="password" name="password" required>
-        </label><br>
-
+    <form action="auth.php" method="POST">
+        <div>
+            <label for="username">Benutzername:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Passwort:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
         <button type="submit">Einloggen</button>
     </form>
+</main>
 
-</body>
-
-</html>
+<?php require_once __DIR__ . '/../../templates/footer.php'; ?>
