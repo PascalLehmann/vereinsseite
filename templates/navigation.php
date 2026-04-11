@@ -5,9 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <nav class="sidebar">
     <input type="checkbox" id="nav-toggle" class="nav-toggle">
-    <label for="nav-toggle" class="nav-toggle-label desktop-hide">
-        <i class="fa-solid fa-bars"></i> MENÜ
-    </label>
+    <label for="menu-toggle" class="mobile-only">≡ MENÜ</label>
 
     <div class="nav-links">
         <div class="nav-section">

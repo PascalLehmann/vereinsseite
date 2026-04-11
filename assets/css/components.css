@@ -65,11 +65,9 @@ details.dropdown-menu ul {
 }
 
 /* Desktop: Verstecke mobile Elemente strikt! */
+/* Diese Klasse blendet Elemente auf Desktop-Bildschirmen rigoros aus */
 @media (min-width: 769px) {
-    /* Setze hier die ID oder Klasse deiner Checkbox und des Labels ein */
-    #menu-toggle, 
-    .menu-btn, 
-    label[for="menu-toggle"] {
+    .mobile-only {
         display: none !important;
     }
 }
