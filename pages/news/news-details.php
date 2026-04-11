@@ -1,56 +1,59 @@
 <?php
-// Nutze include_once, um Abstürze durch doppelte Einbindungen zu vermeiden
-include_once 'db.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// DB laden
+include_once $_SERVER['DOCUMENT_ROOT'] . '/db.php';
 
-// Prüfen, ob die ID gültig ist
+// ID prüfen
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
 if ($id <= 0) {
-    header("Location: news.php");
+    header("Location: /pages/news/news.php");
     exit;
 }
 
+// News laden
 try {
-    // News laden
     $stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
     $stmt->execute([$id]);
     $news = $stmt->fetch();
 
     if (!$news) {
-        header("Location: news.php");
+        header("Location: /pages/news/news.php");
         exit;
     }
 } catch (PDOException $e) {
-    // Falls die Tabelle nicht existiert oder die Verbindung hakt
     die("Datenbankfehler: " . $e->getMessage());
 }
 
 $pageTitle = htmlspecialchars($news['titel']);
-include 'includes/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
 ?>
 
 <div id="page-wrapper">
     <div class="container">
-        <?php include 'includes/nav.php'; ?>
-        
+
         <main class="content">
-            <a href="news.php" class="read-more" style="margin-bottom: 25px;">
+
+            <a href="/pages/news/news.php" class="read-more" style="margin-bottom: 25px;">
                 <i class="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
             </a>
 
             <article class="news-detail-view">
+
                 <small style="color: #666; display: block; margin-bottom: 10px;">
                     <i class="fa-regular fa-clock"></i> <?= date("d.m.Y", strtotime($news['datum'])); ?>
                 </small>
-                
+
                 <h1 style="margin-bottom: 20px;"><?= htmlspecialchars($news['titel']); ?></h1>
 
                 <div class="news-text" style="line-height: 1.8; margin-bottom: 40px;">
-                    <?= $news['inhalt']; ?> 
+                    <?= $news['inhalt']; ?>
                 </div>
 
                 <?php
-                // Bilderstrecke sicher laden
+                // Bilderstrecke laden
                 try {
                     $stmtB = $pdo->prepare("SELECT * FROM news_bilder WHERE news_id = ?");
                     $stmtB->execute([$id]);
@@ -62,21 +65,26 @@ include 'includes/header.php';
                             <?php foreach ($bilder as $bild): ?>
                                 <div class="photo-card">
                                     <div class="photo-box">
-                                        <a href="javascript:void(0)" onclick="openLightbox('img/news/<?= $bild['bild_pfad']; ?>')">
-                                            <img src="img/news/<?= $bild['bild_pfad']; ?>" alt="News Bild">
+                                        <a href="javascript:void(0)"
+                                            onclick="openLightbox('/assets/img/news/<?= $bild['bild_pfad']; ?>')">
+                                            <img src="/assets/img/news/<?= $bild['bild_pfad']; ?>" alt="News Bild">
                                         </a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                    <?php endif; 
+                    <?php endif;
+
                 } catch (PDOException $e) {
                     echo "<p>Bildergalerie konnte nicht geladen werden.</p>";
                 }
                 ?>
+
             </article>
+
         </main>
+
     </div>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
 </div>

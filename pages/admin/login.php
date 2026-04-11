@@ -1,27 +1,37 @@
 <?php
-// Session-Sicherheit: Cookie-Pfad auf Root setzen, damit nav.php sie überall lesen kann
-session_set_cookie_params(0, '/');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
-include_once '../db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    // Tabelle 'users' wie auf deinem Screenshot
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['password'])) {
-        // Wir setzen die ID, die die nav.php abfragt
-        $_SESSION['admin_id'] = $user['id'];
-        session_write_close(); // Sicherstellen, dass die Session gespeichert wird
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $error = "Login fehlgeschlagen!";
-    }
-}
+$pageTitle = "Admin Login";
+include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
 ?>
+
+<div id="page-wrapper">
+    <div class="container">
+
+        <main class="content">
+            <h1>Admin Login</h1>
+
+            <?php if (isset($_GET['error'])): ?>
+                <p class="error-message">Login fehlgeschlagen.</p>
+            <?php endif; ?>
+
+            <form action="/pages/admin/auth.php" method="POST">
+                <label>Benutzername</label>
+                <input type="text" name="username" required>
+
+                <label>Passwort</label>
+                <input type="password" name="password" required>
+
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </main>
+
+    </div>
+
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
+</div>
