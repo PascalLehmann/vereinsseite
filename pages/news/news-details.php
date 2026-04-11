@@ -1,90 +1,89 @@
 <?php
-ini_set('display_errors', 1);
+session_start();
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// DB laden
-include_once $_SERVER['DOCUMENT_ROOT'] . '/db.php';
+// 1. DATENBANK EINBINDEN
+require_once __DIR__ . '/../../db.php';
 
-// ID prüfen
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+// 2. ID AUS DER URL HOLEN UND PRÜFEN
+$news_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-if ($id <= 0) {
-    header("Location: /pages/news/news.php");
-    exit;
+if ($news_id <= 0) {
+    die("Ungültige News-ID.");
 }
 
-// News laden
-try {
-    $stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
-    $stmt->execute([$id]);
-    $news = $stmt->fetch();
-
-    if (!$news) {
-        header("Location: /pages/news/news.php");
-        exit;
-    }
-} catch (PDOException $e) {
-    die("Datenbankfehler: " . $e->getMessage());
-}
-
-$pageTitle = htmlspecialchars($news['titel']);
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
+// 3. LAYOUT EINBINDEN
+require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
-
-        <main class="content">
-
-            <a href="/pages/news/news.php" class="read-more" style="margin-bottom: 25px;">
-                <i class="fa-solid fa-arrow-left"></i> Zurück zur Übersicht
-            </a>
-
-            <article class="news-detail-view">
-
-                <small style="color: #666; display: block; margin-bottom: 10px;">
-                    <i class="fa-regular fa-clock"></i> <?= date("d.m.Y", strtotime($news['datum'])); ?>
-                </small>
-
-                <h1 style="margin-bottom: 20px;"><?= htmlspecialchars($news['titel']); ?></h1>
-
-                <div class="news-text" style="line-height: 1.8; margin-bottom: 40px;">
-                    <?= $news['inhalt']; ?>
-                </div>
-
-                <?php
-                // Bilderstrecke laden
-                try {
-                    $stmtB = $pdo->prepare("SELECT * FROM news_bilder WHERE news_id = ?");
-                    $stmtB->execute([$id]);
-                    $bilder = $stmtB->fetchAll();
-
-                    if ($bilder): ?>
-                        <h3>Bilderstrecke</h3>
-                        <div class="photo-grid">
-                            <?php foreach ($bilder as $bild): ?>
-                                <div class="photo-card">
-                                    <div class="photo-box">
-                                        <a href="javascript:void(0)"
-                                            onclick="openLightbox('/assets/img/news/<?= $bild['bild_pfad']; ?>')">
-                                            <img src="/assets/img/news/<?= $bild['bild_pfad']; ?>" alt="News Bild">
-                                        </a>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif;
-
-                } catch (PDOException $e) {
-                    echo "<p>Bildergalerie konnte nicht geladen werden.</p>";
-                }
-                ?>
-
-            </article>
-
-        </main>
-
+<main>
+    <div class="action-bar">
+        <a href="news.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-</div>
+    <?php
+    try {
+        // A) Die spezifische News abfragen
+        $sql = "SELECT titel, inhalt, erstellt_am FROM news WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':id' => $news_id]);
+        $news = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($news) {
+            echo "<article class='content-tile'>";
+
+            // Titel und Datum
+            echo "<h2 style='margin-bottom: 5px;'>" . htmlspecialchars($news['titel']) . "</h2>";
+            echo "<small style='color: #6b7280; display: block; margin-bottom: 20px;'>Veröffentlicht am: " . date('d.m.Y H:i', strtotime($news['erstellt_am'])) . "</small>";
+
+            // B) Der Hauptinhalt vom CKEditor
+            echo "<div class='news-content'>";
+            echo $news['inhalt'];
+            echo "</div>";
+
+            // =================================================================
+            // HIER WAR DER FEHLER: Dieser Block hat gefehlt!
+            // C) Die hochgeladenen Bildergalerie abfragen und in $bilder speichern
+            // =================================================================
+            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :id ORDER BY id ASC";
+            $stmtBilder = $pdo->prepare($sqlBilder);
+            $stmtBilder->execute([':id' => $news_id]);
+            $bilder = $stmtBilder->fetchAll(PDO::FETCH_COLUMN);
+
+            // D) Wenn es Bilder gibt, rendern wir sie als klickbare Thumbnails
+            if (count($bilder) > 0) {
+                echo "<hr style='border: 0; border-top: 1px solid #eee; margin: 30px 0;'>";
+                echo "<h3>Galerie (zum Vergrößern klicken)</h3>";
+
+                echo "<div class='news-gallery'>";
+                foreach ($bilder as $pfad) {
+                    echo "<img src='" . htmlspecialchars($pfad) . "' alt='Bild zur News' class='news-thumbnail'>";
+                }
+                echo "</div>";
+            }
+
+            echo "</article>";
+
+        } else {
+            echo "<div class='content-tile alert-error'>Diese News existiert leider nicht (mehr).</div>";
+        }
+
+    } catch (PDOException $e) {
+        echo "<div class='content-tile alert-error'>Fehler beim Laden der News: " . $e->getMessage() . "</div>";
+    }
+    ?>
+
+    <div id="imageLightbox" class="news-lightbox-modal">
+        <span class="news-lightbox-close">&times;</span>
+        <div class="news-lightbox-content">
+            <img class="news-lightbox-image" id="lightboxImage" alt="Vergrößerte Ansicht">
+        </div>
+    </div>
+
+</main>
+
+<?php
+require_once __DIR__ . '/../../templates/footer.php';
+?>

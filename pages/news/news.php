@@ -1,10 +1,10 @@
 <?php
 session_start();
+// Fehlerberichterstattung für die Entwicklung
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// 1. DATENBANK EINBINDEN (Das ist der Fix für den Fehler!)
-// Wir gehen von pages/news/ zwei Ordner hoch ins Hauptverzeichnis zur db.php
+// 1. DATENBANK EINBINDEN (2 Ebenen nach oben ins Hauptverzeichnis)
 require_once __DIR__ . '/../../db.php';
 
 // 2. LAYOUT EINBINDEN
@@ -15,52 +15,69 @@ require_once __DIR__ . '/../../templates/navigation.php';
 <main>
     <h2>Aktuelle News</h2>
 
-    <?php
-    try {
-        // 1. Alle News abfragen (Jetzt mit den korrekten deutschen Spaltennamen!)
-        $sql = "SELECT id, titel, inhalt, erstellt_am FROM news ORDER BY erstellt_am DESC";
-        $stmt = $pdo->query($sql);
-        $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    <div class="news-list">
+        <?php
+        try {
+            // News abfragen (neueste zuerst)
+            $sql = "SELECT id, titel, inhalt, erstellt_am FROM news ORDER BY erstellt_am DESC";
+            $stmt = $pdo->query($sql);
+            $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 2. Das Prepared Statement für die Bilder vorbereiten (Optimierung!)
-        // Das ist wie das Vorkompilieren einer Funktion. Wir rufen sie später im Loop nur noch auf.
-        $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :news_id";
-        $stmtBilder = $pdo->prepare($sqlBilder);
+            // Prepared Statement für das Thumbnail (LIMIT 1 für optimale Performance)
+            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :news_id ORDER BY id ASC LIMIT 1";
+            $stmtBilder = $pdo->prepare($sqlBilder);
 
-        if (count($news_entries) > 0) {
-            foreach ($news_entries as $news) {
-                echo "<article class='news-item' style='margin-bottom: 40px;'>";
-                echo "<h3>" . htmlspecialchars($news['titel']) . "</h3>";
-                echo "<small style='color: #666;'>Veröffentlicht am: " . date('d.m.Y H:i', strtotime($news['erstellt_am'])) . "</small>";
-                echo "<p style='margin-top: 10px;'>" . nl2br(htmlspecialchars($news['inhalt'])) . "</p>";
+            if (count($news_entries) > 0) {
+                foreach ($news_entries as $news) {
 
-                // 3. Bilder für exakt diese News-ID abfragen
-                $stmtBilder->execute([':news_id' => $news['id']]);
-                // FETCH_COLUMN holt direkt ein flaches Array der Pfade (z.B. ['/uploads/a.jpg', '/uploads/b.png'])
-                $bilder = $stmtBilder->fetchAll(PDO::FETCH_COLUMN);
+                    // START: Die 3D Kachel
+                    echo "<article class='content-tile'>";
+                    echo "<div class='news-preview'>";
 
-                // 4. Wenn Bilder existieren, als kleine Galerie ausgeben
-                if (count($bilder) > 0) {
-                    echo "<div class='news-gallery' style='display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;'>";
-                    foreach ($bilder as $pfad) {
-                        // WICHTIG: absolute Pfade nutzen!
-                        echo "<img src='" . htmlspecialchars($pfad) . "' alt='News Bild' style='max-width: 200px; border-radius: 8px; object-fit: cover;'>";
+                    // 1. Thumbnail abfragen und rendern
+                    $stmtBilder->execute([':news_id' => $news['id']]);
+                    $erstes_bild = $stmtBilder->fetchColumn(); // Holt direkt den String, da wir nur 1 Spalte & 1 Zeile abfragen
+        
+                    echo "<div class='news-thumb'>";
+                    if ($erstes_bild) {
+                        // Wenn ein Bild existiert
+                        echo "<img src='" . htmlspecialchars($erstes_bild) . "' alt='News Thumbnail'>";
+                    } else {
+                        // Fallback: FontAwesome Icon, wenn kein Bild hochgeladen wurde
+                        echo "<i class='fas fa-newspaper'></i>";
                     }
                     echo "</div>";
+
+                    // 2. Textbereich (Titel, Excerpt, Button)
+                    echo "<div class='news-preview-text'>";
+                    echo "<h3>" . htmlspecialchars($news['titel']) . "</h3>";
+
+                    // HTML vom CKEditor strippen (entfernen) und Zeilenumbrüche löschen
+                    $clean_text = strip_tags($news['inhalt']);
+                    $clean_text = str_replace(["\r", "\n"], ' ', $clean_text);
+
+                    // Ausgabe des gekürzten Textes (CSS white-space: nowrap übernimmt das "... " am Ende)
+                    echo "<div class='news-excerpt'>" . htmlspecialchars($clean_text) . "</div>";
+
+                    // Der "Mehr lesen" Button
+                    echo "<a href='news-details.php?id=" . $news['id'] . "' class='btn btn-secondary btn-sm'>Mehr lesen</a>";
+
+                    echo "</div>"; // Ende .news-preview-text
+                    echo "</div>"; // Ende .news-preview
+                    echo "</article>"; // Ende .content-tile
                 }
-
-                echo "</article><hr>";
+            } else {
+                echo "<div class='content-tile'><p>Bisher gibt es noch keine Neuigkeiten.</p></div>";
             }
-        } else {
-            echo "<p>Bisher gibt es noch keine Neuigkeiten.</p>";
-        }
 
-    } catch (PDOException $e) {
-        echo "<p style='color: red;'>Fehler beim Laden der News: " . $e->getMessage() . "</p>";
-    }
-    ?>
+        } catch (PDOException $e) {
+            echo "<div class='content-tile alert-error'>Fehler beim Laden der News: " . $e->getMessage() . "</div>";
+        }
+        ?>
+    </div>
 </main>
 
 <?php
+// 3. FOOTER EINBINDEN
 require_once __DIR__ . '/../../templates/footer.php';
 ?>

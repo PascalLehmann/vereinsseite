@@ -179,3 +179,300 @@ details.dropdown-menu ul {
     border-radius: 4px;
     margin-bottom: 15px;
 }
+
+/* =========================================
+   NEWS ANZEIGE IM FRONTEND
+   ========================================= */
+.news-gallery {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.news-gallery img {
+    max-width: 250px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.news-gallery img:hover {
+    transform: scale(1.05); /* Leichter Zoom-Effekt beim Drüberfahren */
+}
+
+/* Falls der CKEditor Bilder in den Text einfügt, dürfen diese nicht das Layout sprengen */
+.news-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* =========================================
+   GLOBALE 3D KACHELN (Cards)
+   ========================================= */
+.content-tile {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    
+    /* Der 3D Effekt: Mehrere softe Schatten für echte Tiefe */
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 15px 25px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    /* Sanftes "Anheben" beim Drüberfahren (Hover) */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-tile:hover {
+    transform: translateY(-4px); /* Hebt die Kachel leicht an */
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================
+   NEWS VORSCHAU-LAYOUT (Flexbox)
+   ========================================= */
+.news-preview {
+    display: flex;
+    align-items: center; /* Bild und Text auf einer Linie zentrieren */
+    gap: 20px; /* Abstand zwischen Bild und Text */
+}
+
+/* Das runde Bild links */
+.news-thumb {
+    flex-shrink: 0; /* Verhindert, dass das Bild bei viel Text gequetscht wird */
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f3f4f6;
+    border: 2px solid var(--sidebar-color);
+}
+
+.news-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Schneidet das Bild perfekt als Kreis zu */
+}
+
+.news-thumb i {
+    font-size: 35px;
+    color: var(--sidebar-color); /* Fallback Icon Farbe */
+}
+
+/* Der Text rechts */
+.news-preview-text {
+    flex-grow: 1;
+    min-width: 0; /* WICHTIG: Erlaubt das Abschneiden von Text im Grid/Flex! */
+}
+
+.news-preview-text h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.news-preview-text .news-excerpt {
+    margin: 0 0 10px 0;
+    color: #666;
+    
+    /* Der Trick für 1 Zeile abschneiden! */
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; /* Macht die "..." am Ende */
+    padding-right: 20px; /* Die gewünschten 20px Puffer zum Rand */
+}
+
+/* Ein kleinerer Button-Style für Listen */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+/* =========================================
+   LIGHTBOX MODAL (Bild Vergrößerung)
+   ========================================= */
+
+/* 1. Die klickbaren Thumbnails in der Galerie */
+.news-gallery .news-thumbnail {
+    max-width: 250px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 3D-Schatten */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer; /* Zeigt, dass es klickbar ist */
+}
+
+.news-gallery .news-thumbnail:hover {
+    transform: scale(1.05); /* Leichter Zoom beim Hover */
+    box-shadow: 0 10px 15px rgba(0,0,0,0.2); /* Tieferer Schatten */
+}
+
+/* 2. Der schwarze Hintergrund (Overlay) */
+.news-lightbox-modal {
+    display: none; /* Standardmäßig versteckt */
+    position: fixed; /* Liegt über ALLEM, bleibt beim Scrollen fix */
+    z-index: 1000; /* Sehr hoher Wert, um über der Navigation zu liegen */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Verhindert Scrollbars im Overlay */
+    background-color: rgba(0, 0, 0, 0.9); /* Fast schwarzer, transparenter Hintergrund */
+    opacity: 0;
+    transition: opacity 0.4s ease; /* Weiches Einblenden */
+}
+
+/* Der 'aktive' Status, der per JavaScript aktiviert wird */
+.news-lightbox-modal.active {
+    display: flex; /* Wir nutzen Flexbox zum Zentrieren! */
+    justify-content: center; /* Zentriert horizontal */
+    align-items: center; /* Zentriert vertikal */
+    opacity: 1;
+}
+
+/* 3. Der Schließen-Button (x) */
+.news-lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 1001; /* Liegt ÜBER dem Bild */
+}
+
+.news-lightbox-close:hover {
+    color: #bbb;
+}
+
+/* 4. Der Bild-Container (Zentrier-Helfer) */
+.news-lightbox-content {
+    position: relative;
+    max-width: 90%; /* Lasse einen kleinen Rand zum Bildschirm-Rand */
+    max-height: 90%; /* Lasse einen kleinen Rand zum Bildschirm-Rand */
+}
+
+/* 5. Das vergrößerte Bild (WICHTIGSTE LOGIK!) */
+.news-lightbox-image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%; /* Verkleinert es, wenn es zu breit für den Container ist */
+    max-height: 100%; /* Verkleinert es, wenn es zu hoch für den Container ist */
+    border-radius: 10px;
+    box-shadow: 0 20px 25px rgba(0,0,0,0.5); /* Starker 3D-Schatten für Tiefe */
+    border: 3px solid white; /* Klassischer Foto-Rahmen */
+    
+    /* Um deine Anforderung 'nicht über Originalgröße' zu erfüllen: 
+       Wir nutzen CSS, um die Originalgröße als absolute Grenze zu setzen.
+       Das CSS hier skaliert das Bild nur nach UNTEN, wenn der Bildschirm klein ist, 
+       aber skaliert es niemals hoch (Dank width: auto; height: auto;). 
+       Die Zentrierung übernimmt der Flex-Container darüber. */
+    object-fit: contain; /* Don't stretch */
+}
+
+/* =========================================
+   TERMINE & SPIELTAGE (Layout)
+   ========================================= */
+
+/* Der kleine Kalender-Block auf der linken Seite */
+.termin-date-box {
+    background: #f3f4f6;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 100px;
+    flex-shrink: 0;
+    border: 1px solid #e5e7eb;
+}
+
+.termin-date-day {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--sidebar-color); /* Nutzen wir dein Vereins-Orange/Blau */
+}
+
+.termin-date-year {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.termin-date-time {
+    font-weight: bold;
+    color: #374151;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Der Bereich für den Text (Gegner, Ort etc.) */
+.termin-details {
+    flex-grow: 1;
+    padding: 0 20px;
+}
+
+/* Das Raster für die Aufstellung (Grid) */
+.kader-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.spieler-card {
+    text-align: center;
+    background: #ffffff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+    transition: transform 0.2s;
+}
+
+.spieler-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.spieler-avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    position: relative;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.spieler-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.spielfuehrer-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #f1c40f;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    font-size: 0.6rem;
+    color: white;
+}

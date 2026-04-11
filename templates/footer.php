@@ -6,7 +6,7 @@
         <a href="/datenschutz.php">Datenschutz</a>
     </p>
 </footer>
-
+<script src="/assets/js/script.js"></script>
 <script>
     function openLightbox(src) {
         const overlay = document.getElementById('lightbox-overlay');

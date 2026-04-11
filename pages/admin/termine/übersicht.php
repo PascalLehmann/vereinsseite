@@ -1,63 +1,96 @@
 <?php
-include_once 'auth.php';
-checkLogin();
-include_once '../db.php';
-$pageTitle = "Termin-Verwaltung";
-include_once '../includes/header.php';
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Daten laden
-$sql = "SELECT t.*, g.name AS gegner_name 
-        FROM termine t 
-        LEFT JOIN gegner g ON t.gegner_id = g.id 
-        ORDER BY t.termin_datum DESC";
-$stmt = $pdo->query($sql);
-$termine = $stmt->fetchAll();
+// 1. ZUGRIFFSPRÜFUNG
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
+// 2. DATENBANK & LAYOUT EINBINDEN
+require_once __DIR__ . '/../../../db.php';
+require_once __DIR__ . '/../../../templates/header.php';
+require_once __DIR__ . '/../../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
-        <?php include_once '../includes/nav.php'; ?>
-        
-        <main class="content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h1>Termin-Verwaltung</h1>
-                <a href="termine-create.php" class="read-more" style="background: var(--primary-orange); color: white; border: none;">
-                    <i class="fa-solid fa-plus"></i> Neuen Termin anlegen
-                </a>
-            </div>
+<main>
+    <h2>Termine verwalten</h2>
 
-            <div class="news-card" style="padding: 0; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                    <thead>
-                        <tr style="background: #f4f7f6; text-align: left;">
-                            <th style="padding: 15px;">Datum</th>
-                            <th style="padding: 15px;">Typ</th>
-                            <th style="padding: 15px;">Titel / Gegner</th>
-                            <th style="padding: 15px; text-align: center;">Aktion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($termine as $t): ?>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 15px;">
-                                    <strong><?= date("d.m.Y", strtotime($t['termin_datum'])) ?></strong>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; background: <?= $t['typ'] == 'spiel' ? '#fdf2e9' : '#ebf5fb' ?>;">
-                                        <?= $t['typ'] == 'spiel' ? 'Spiel' : 'Allgemein' ?>
-                                    </span>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <?= htmlspecialchars($t['typ'] == 'spiel' ? "vs. ".$t['gegner_name'] : $t['titel']) ?>
-                                </td>
-                                <td style="padding: 15px; text-align: center;">
-                                    <a href="termine-edit.php?id=<?= $t['id'] ?>" style="margin-right:10px;"><i class="fa-solid fa-pen"></i></a>
-                                    <a href="termine-delete.php?id=<?= $t['id'] ?>" style="color:red;" onclick="return confirm('Löschen?')"><i class="fa-solid fa-trash"></i></a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-  </main>
-    </div> </div> <?php include_once '../includes/footer.php'; ?>
+    <div class="action-bar">
+        <a href="erstellen.php" class="btn btn-primary">+ Neuen Termin anlegen</a>
+    </div>
+
+    <?php if (isset($_GET['success'])): ?>
+        <p style="color: green; font-weight: bold; margin-bottom: 15px;">Aktion erfolgreich durchgeführt!</p>
+    <?php endif; ?>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Typ</th>
+                <th>Titel / Gegner</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            try {
+                // Wir holen die Termine, die NEUESTEN bzw. KOMMENDEN zuerst
+                // (Oder ORDER BY termin_datum DESC, je nachdem wie du es lieber magst)
+                $sql = "SELECT t.id, t.typ, t.titel, t.veranstaltungsart, t.termin_datum, g.name AS gegner_name 
+                        FROM termine t 
+                        LEFT JOIN gegner g ON t.gegner_id = g.id 
+                        ORDER BY t.termin_datum DESC";
+
+                $stmt = $pdo->query($sql);
+                $termine = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (count($termine) > 0) {
+                    foreach ($termine as $row) {
+                        echo "<tr>";
+
+                        // 1. Datum formatieren
+                        $datum = $row['termin_datum'] ? date('d.m.Y', strtotime($row['termin_datum'])) : 'Kein Datum';
+                        echo "<td>" . $datum . "</td>";
+
+                        // 2. Typ (Spiel oder Event) mit Farbe
+                        if ($row['typ'] === 'spiel') {
+                            echo "<td style='color: #e67e22; font-weight: bold;'>Spiel</td>";
+                        } else {
+                            echo "<td style='color: #3498db; font-weight: bold;'>Event</td>";
+                        }
+
+                        // 3. Titel (Logik: Wenn Spiel, zeige Gegner, sonst Titel/Art)
+                        $anzeige_titel = "";
+                        if ($row['typ'] === 'spiel' && !empty($row['gegner_name'])) {
+                            $anzeige_titel = "vs. " . htmlspecialchars($row['gegner_name']);
+                        } else {
+                            $anzeige_titel = htmlspecialchars($row['titel'] ?: $row['veranstaltungsart']);
+                        }
+                        echo "<td>" . $anzeige_titel . "</td>";
+
+                        // 4. Aktionen (Buttons)
+                        echo "<td>";
+                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link'>Bearbeiten</a>";
+                        echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' onclick='return confirm(\"Wirklich löschen?\");'>Löschen</a>";
+                        echo "</td>";
+
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='4' style='text-align: center;'>Keine Termine vorhanden.</td></tr>";
+                }
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='4' class='alert-error'>Datenbank-Fehler: " . $e->getMessage() . "</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</main>
+
+<?php
+require_once __DIR__ . '/../../../templates/footer.php';
+?>

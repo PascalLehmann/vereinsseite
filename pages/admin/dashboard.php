@@ -34,7 +34,7 @@ require_once __DIR__ . '/../../templates/header.php';
         if ($isAdmin || $isAutor):
             ?>
             <li><a href="news/übersicht.php">News verwalten</a></li>
-            <li><a href="termine/übersicht.php">Termine verwalten</a></li>
+            <li><a href="/pages/admin/termine/übersicht.php">Termine verwalten</a></li>
             <li><a href="gegner/übersicht.php">Gegner verwalten</a></li>
         <?php endif; ?>
 
