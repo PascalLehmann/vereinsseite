@@ -1,25 +1,22 @@
 <?php
 session_start();
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../../db.php';
 
-if (empty($_SESSION['user_id']) || !in_array('admin', $_SESSION['rollen'] ?? [])) {
+if (!in_array('admin', $_SESSION['rollen'])) {
     die("Kein Zugriff.");
 }
 
 $id = $_GET['id'] ?? 0;
 
-// Rolle laden
 $stmt = $pdo->prepare("SELECT * FROM roles WHERE id = ?");
 $stmt->execute([$id]);
 $rolle = $stmt->fetch();
 
-if (!$rolle) {
+if (!$rolle)
     die("Rolle nicht gefunden.");
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
-
     if ($name !== '') {
         $stmt = $pdo->prepare("UPDATE roles SET name = ? WHERE id = ?");
         $stmt->execute([$name, $id]);
@@ -29,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!doctype html>
-<html lang="de">
+<html>
 
 <head>
     <meta charset="utf-8">
@@ -43,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post">
         <label>Rollenname:
             <input type="text" name="name" value="<?= htmlspecialchars($rolle['name']) ?>" required>
-        </label>
-        <br><br>
+        </label><br><br>
+
         <button type="submit">Speichern</button>
     </form>
 

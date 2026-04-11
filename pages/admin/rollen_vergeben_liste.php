@@ -1,19 +1,19 @@
 <?php
 session_start();
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../../db.php';
 
-if (empty($_SESSION['user_id']) || !in_array('admin', $_SESSION['rollen'])) {
+if (!in_array('admin', $_SESSION['rollen'])) {
     die("Kein Zugriff.");
 }
 
 $users = $pdo->query("SELECT id, username FROM users ORDER BY username ASC")->fetchAll();
 ?>
 <!doctype html>
-<html lang="de">
+<html>
 
 <head>
     <meta charset="utf-8">
-    <title>Rollen an Benutzer vergeben</title>
+    <title>Rollen vergeben</title>
 </head>
 
 <body>
