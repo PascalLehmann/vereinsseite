@@ -1,52 +1,74 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: /pages/admin/login.php");
+require_once __DIR__ . '/../db.php';
+
+// 1. Login prüfen
+if (empty($_SESSION['user_id'])) {
+    header("Location: ../login.php");
     exit;
 }
 
+// 2. Rollen laden
+$stmt = $pdo->prepare("
+    SELECT r.name 
+    FROM roles r
+    JOIN user_roles ur ON ur.role_id = r.id
+    WHERE ur.user_id = ?
+");
+$stmt->execute([$_SESSION['user_id']]);
+$rollen = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$pageTitle = "Admin Dashboard";
-
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
+// 3. Hilfsfunktion
+function hatRolle($rolle, $rollen)
+{
+    return in_array($rolle, $rollen);
+}
 ?>
+<!doctype html>
+<html lang="de">
 
-<div id="page-wrapper">
-    <div class="container">
+<head>
+    <meta charset="utf-8">
+    <title>Admin-Dashboard</title>
+</head>
 
-        <main class="content">
-            <h1>Admin Dashboard</h1>
+<body>
 
-            <div class="admin-grid">
+    <h1>Willkommen, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
 
-                <a class="admin-card" href="/pages/admin/news/übersicht.php">
-                    <i class="fa-solid fa-newspaper"></i>
-                    <h3>News verwalten</h3>
-                </a>
+    <p>Deine Rollen: <?php echo implode(", ", $rollen); ?></p>
 
-                <a class="admin-card" href="/pages/admin/mitglieder/übersicht.php">
-                    <i class="fa-solid fa-users"></i>
-                    <h3>Mitglieder verwalten</h3>
-                </a>
+    <hr>
 
-                <a class="admin-card" href="/pages/admin/gegner/übersicht.php">
-                    <i class="fa-solid fa-shield"></i>
-                    <h3>Gegner verwalten</h3>
-                </a>
+    <?php if (hatRolle('admin', $rollen)): ?>
+        <h2>Admin-Bereich</h2>
+        <ul>
+            <li><a href="user_anlegen.php">Neuen Benutzer anlegen</a></li>
+            <li><a href="rollen_vergeben.php">Rollen vergeben</a></li>
+            <li><a href="system_logs.php">System-Logs</a></li>
+        </ul>
+    <?php endif; ?>
 
-                <a class="admin-card" href="/pages/admin/termine/übersicht.php">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <h3>Termine verwalten</h3>
-                </a>
+    <?php if (hatRolle('autor', $rollen)): ?>
+        <h2>Autoren-Bereich</h2>
+        <ul>
+            <li><a href="beitrag_erstellen.php">Beitrag erstellen</a></li>
+            <li><a href="beitrag_verwalten.php">Beiträge verwalten</a></li>
+        </ul>
+    <?php endif; ?>
 
-            </div>
+    <?php if (hatRolle('mitglied', $rollen)): ?>
+        <h2>Mitglieder-Bereich</h2>
+        <ul>
+            <li><a href="profil.php">Mein Profil</a></li>
+            <li><a href="vereinsinfos.php">Vereinsinformationen</a></li>
+        </ul>
+    <?php endif; ?>
 
-        </main>
+    <hr>
 
-    </div>
+    <a href="../logout.php">Logout</a>
 
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-</div>
+</body>
+
+</html>
