@@ -50,8 +50,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         echo "<td>" . htmlspecialchars($row['titel']) . "</td>";
                         echo "<td>" . date('d.m.Y H:i', strtotime($row['erstellt_am'])) . "</td>";
                         echo "<td>";
-                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link'>Bearbeiten</a>";
-                        echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' onclick='return confirm(\"Wirklich löschen?\");'>Löschen</a>";
+                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
                         echo "</td>";
                         echo "</tr>";
                     }

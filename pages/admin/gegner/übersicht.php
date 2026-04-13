@@ -1,43 +1,66 @@
 <?php
-include_once '../auth.php'; 
-checkLogin();
-include_once '../../db.php';
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// 1. ZUGRIFFSPRÜFUNG (RBAC - Wie ein #ifdef)
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+    die("Zugriff verweigert: Du hast nicht die nötigen Rechte für diese Seite.");
+}
 $pageTitle = "Gegner Verwaltung";
-include_once '../../includes/header.php';
+require_once __DIR__ . '/../../../db.php';
+require_once __DIR__ . '/../../../templates/header.php';
+require_once __DIR__ . '/../../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
-        <?php include_once '../../includes/nav.php'; ?>
-        
-        <main class="content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h1>Gegner Verwaltung</h1>
-                <a href="erstellen.php" class="read-more">Neuer Gegner</a>
-            </div>
+<main>
+    <h2>Gegner verwalten</h2>
 
-            <div class="news-card" style="padding:0; overflow: hidden;">
-                <table>
-                    <thead>
-                        <tr style="background:#f4f7f6;">
-                            <th style="padding:15px; text-align:left;">Verein</th>
-                            <th style="padding:15px; text-align:center;">Aktion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        $stmt = $pdo->query("SELECT * FROM gegner ORDER BY name ASC");
-                        while($g = $stmt->fetch()): ?>
-                        <tr style="border-bottom:1px solid #eee;">
-                            <td style="padding:15px;"><strong><?= htmlspecialchars($g['name']) ?></strong></td>
-                            <td style="padding:15px; text-align:center;">
-                                <a href="bearbeiten.php?id=<?= $g['id'] ?>" style="margin-right:15px; color:#3498db;"><i class="fa-solid fa-pen"></i></a>
-                                <a href="loeschen.php?id=<?= $g['id'] ?>" style="color:#e74c3c;" onclick="return confirm('Löschen?')"><i class="fa-solid fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div> <?php include_once '../../includes/footer.php'; ?> </div>
+    <div class="action-bar">
+        <a href="erstellen.php" class="btn btn-secondary">+ Neuen Gegner anlegen</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Verein</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            try {
+                $stmt = $pdo->query("SELECT * FROM gegner ORDER BY name ASC");
+                $gegner_liste = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (count($gegner_liste) > 0) {
+                    foreach ($gegner_liste as $g) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($g['id']) . "</td>";
+                        echo "<td><strong>" . htmlspecialchars($g['name']) . "</strong></td>";
+                        echo "<td>";
+                        echo "<a href='bearbeiten.php?id=" . $g['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        echo "<a href='loeschen.php?id=" . $g['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
+                        echo "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='3' style='text-align: center;'>Keine Gegner vorhanden.</td></tr>";
+                }
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='3' class='alert-error'>Datenbank-Fehler: " . $e->getMessage() . "</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</main>
+<?php
+require_once __DIR__ . '/../../../templates/footer.php';
+?>

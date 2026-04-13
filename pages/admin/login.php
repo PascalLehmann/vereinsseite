@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../templates/header.php';
 ?>
 
 <main class="login-container">
-    <h2>Admin Login</h2>
+    <h2>Login</h2>
 
     <?php
     // Fehlermeldung anzeigen, falls auth.php uns mit einem Fehler zurückschickt

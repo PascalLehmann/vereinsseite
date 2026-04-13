@@ -1,5 +1,17 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . '/db.php';
+session_start();
+
+// 1. ZUGRIFFSPRÜFUNG
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+    die("Zugriff verweigert.");
+}
+
+require_once __DIR__ . '/../../../db.php';
 
 $id = (int) ($_GET['id'] ?? 0);
 

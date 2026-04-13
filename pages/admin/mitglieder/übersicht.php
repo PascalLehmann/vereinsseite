@@ -1,95 +1,88 @@
 <?php
-include_once '../auth.php';
-checkLogin();
-include_once '../../db.php';
-$pageTitle = "Mitglieder Übersicht";
-include_once '../../includes/header.php';
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Mitglieder laden
-$stmt = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC");
-$mitglieder = $stmt->fetchAll();
+// 1. ZUGRIFFSPRÜFUNG
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles)) {
+    die("Zugriff verweigert: Nur Administratoren dürfen Mitglieder verwalten.");
+}
+
+// 2. DATENBANK & LAYOUT EINBINDEN
+require_once __DIR__ . '/../../../db.php';
+require_once __DIR__ . '/../../../templates/header.php';
+require_once __DIR__ . '/../../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
-        <?php include_once '../../includes/nav.php'; ?>
+<main>
+    <h2>Mitglieder verwalten</h2>
 
-        <main class="content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h1>Mitglieder Verwaltung</h1>
-                <a href="erstellen.php" class="read-more">
-                    <i class="fa-solid fa-plus"></i> Neues Mitglied
-                </a>
-            </div>
+    <div class="action-bar">
+        <a href="erstellen.php" class="btn btn-secondary">+ Neues Mitglied anlegen</a>
+    </div>
 
-            <div class="news-card" style="padding:0; overflow: hidden;">
-                <table>
-                    <thead>
-                        <tr style="background:#f4f7f6; border-bottom: 2px solid #eee;">
-                            <th style="padding:15px; text-align:left; width: 80px;">Bild</th>
-                            <th style="padding:15px; text-align:left;">Name & Status</th>
-                            <th style="padding:15px; text-align:center; width: 120px;">Aktion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($mitglieder as $m): ?>
-                            <tr style="border-bottom:1px solid #eee;">
-                                <td style="padding:10px;">
-                                    <div class="news-image-circle" style="width:60px; height:60px; min-width:60px;">
-                                        <?php
-                                        $bild = !empty($m['profilbild']) ? "../../img/mitglieder/" . $m['profilbild'] : "../../img/mitglieder/default-user.png";
-                                        ?>
-                                        <img src="<?= $bild ?>" alt="Profil">
-                                    </div>
-                                </td>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th style="width: 80px;">Bild</th>
+                <th>Name & Status</th>
+                <th style="width: 120px;">Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            try {
+                $stmt = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC");
+                $mitglieder = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                <td style="padding:15px;">
-                                    <strong style="font-size: 1.1rem; color: var(--secondary-blue);">
-                                        <?= htmlspecialchars($m['vorname'] . " " . $m['nachname']) ?>
-                                    </strong>
-                                    <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
-                                        <?php if ($m['im_vorstand']): ?>
-                                            <span
-                                                style="background: #fdf2e9; color: #e67e22; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; border: 1px solid #e67e22; font-weight: bold;">
-                                                <i class="fa-solid fa-star"></i> <?= htmlspecialchars($m['vorstands_rolle']) ?>
-                                            </span>
-                                        <?php endif; ?>
+                if (count($mitglieder) > 0) {
+                    foreach ($mitglieder as $m) {
+                        echo "<tr>";
 
-                                        <?php if (isset($m['ist_gruendungsmitglied']) && $m['ist_gruendungsmitglied']): ?>
-                                            <span
-                                                style="background: #ebf5fb; color: #2980b9; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; border: 1px solid #2980b9; font-weight: bold;">
-                                                <i class="fa-solid fa-certificate"></i> Gründer
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
+                        // Bild
+                        echo "<td>";
+                        echo "<div class='spieler-avatar' style='width:50px; height:50px; margin:0;'>";
+                        $bildPfad = !empty($m['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($m['profilbild']) : '/assets/img/mitglieder/default-user.png';
+                        echo "<img src='" . $bildPfad . "' alt='Profil'>";
+                        echo "</div>";
+                        echo "</td>";
 
-                                <td style="padding:15px; text-align:center;">
-                                    <div style="display: flex; justify-content: center; gap: 20px;">
-                                        <a href="bearbeiten.php?id=<?= $m['id'] ?>"
-                                            style="color: var(--secondary-blue); font-size: 1.2rem;" title="Bearbeiten">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                        <a href="loeschen.php?id=<?= $m['id'] ?>" style="color: #e74c3c; font-size: 1.2rem;"
-                                            title="Löschen"
-                                            onclick="return confirm('Möchtest du <?= htmlspecialchars($m['vorname']) ?> wirklich unwiderruflich löschen?')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                        // Name & Status
+                        echo "<td>";
+                        echo "<strong>" . htmlspecialchars($m['vorname'] . " " . $m['nachname']) . "</strong>";
+                        echo "<div style='margin-top: 5px; font-size: 0.85rem; display: flex; gap: 10px;'>";
+                        if ($m['im_vorstand']) {
+                            echo "<span style='color: #e67e22; font-weight: bold;'><i class='fa-solid fa-star'></i> " . htmlspecialchars($m['vorstands_rolle']) . "</span>";
+                        }
+                        if (!empty($m['ist_gruendungsmitglied'])) {
+                            echo "<span style='color: #2980b9; font-weight: bold;'><i class='fa-solid fa-certificate'></i> Gründer</span>";
+                        }
+                        echo "</div>";
+                        echo "</td>";
 
-                        <?php if (empty($mitglieder)): ?>
-                            <tr>
-                                <td colspan="3" style="padding: 40px; text-align: center; color: #999;">
-                                    Keine Mitglieder gefunden.
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div> <?php include_once '../../includes/footer.php'; ?>
-</div>
+                        // Aktionen
+                        echo "<td>";
+                        echo "<a href='bearbeiten.php?id=" . $m['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        echo "<a href='loeschen.php?id=" . $m['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
+                        echo "</td>";
+
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='3' style='text-align: center;'>Keine Mitglieder vorhanden.</td></tr>";
+                }
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='3' class='alert-error'>Datenbank-Fehler: " . $e->getMessage() . "</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</main>
+
+<?php require_once __DIR__ . '/../../../templates/footer.php'; ?>

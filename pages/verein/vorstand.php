@@ -1,60 +1,74 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+
 $pageTitle = "Vorstand";
 $activePage = 'vorstand.php'; // Für die Fokus-Logik im Menü
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php'; ?>
 
-<div id="page-wrapper">
-    <div class="container">
-        <?php include 'includes/nav.php'; ?>
+// 2. DATENBANK EINBINDEN
+require_once __DIR__ . '/../../db.php';
 
-        <main class="content">
-            <h1>Unser Vorstand</h1>
-            <p>Die gewählten Vertreter unseres Vereins.</p>
+// 3. LAYOUT EINBINDEN
+require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
 
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 30px;">
+// 4. VORSTAND AUS DER DATENBANK LADEN
+// Wir sortieren die Mitglieder nach Wichtigkeit des Amtes (1. Vorsitzender zuerst etc.)
+$sql = "SELECT id, vorname, nachname, vorstands_rolle, profilbild 
+        FROM mitglieder 
+        WHERE im_vorstand = 1 
+        ORDER BY 
+            CASE vorstands_rolle
+                WHEN '1. Vorsitzender' THEN 1
+                WHEN '1. Vorsitzende' THEN 1
+                WHEN '2. Vorsitzender' THEN 2
+                WHEN '2. Vorsitzende' THEN 2
+                WHEN 'Schatzmeister' THEN 3
+                WHEN 'Schatzmeisterin' THEN 3
+                WHEN 'Kassenwart' THEN 3
+                WHEN 'Kassenwartin' THEN 3
+                WHEN 'Schriftführer' THEN 4
+                WHEN 'Schriftführerin' THEN 4
+                WHEN 'Sportwart' THEN 5
+                ELSE 99
+            END ASC,
+            nachname ASC";
+$vorstand_mitglieder = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-                <article class="news-card" style="text-align: center;">
-                    <div class="profile-preview-circle">
-                        <img src="https://via.placeholder.com/150" alt="1. Vorsitzender">
+?>
+
+<main class="content">
+    <h1>Unser Vorstand</h1>
+    <p>Die gewählten Vertreter unseres Vereins.</p>
+
+    <div class="vorstand-grid">
+        <?php if (count($vorstand_mitglieder) > 0): ?>
+            <?php foreach ($vorstand_mitglieder as $m): ?>
+                <div class="vorstand-card">
+                    <div class="vorstand-avatar">
+                        <img src="<?= !empty($m['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($m['profilbild']) : '/assets/img/mitglieder/default-user.png' ?>"
+                            alt="<?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?>">
                     </div>
-                    <h2>Max Mustermann</h2>
-                    <p><strong>1. Vorsitzender</strong></p>
-                    <p style="font-size: 0.9rem; color: #666; margin: 10px 0;">Leitung des Vereins und Repräsentation
-                        nach außen.</p>
-                    <a href="mitglied-details.php?id=1&typ=vorstand" class="read-more">Kontakt & Info</a>
-                </article>
-
-                <article class="news-card" style="text-align: center;">
-                    <div class="profile-preview-circle">
-                        <img src="https://via.placeholder.com/150" alt="2. Vorsitzender">
+                    <div class="vorstand-info">
+                        <h3>
+                            <?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?>
+                        </h3>
+                        <p class="rolle">
+                            <?= htmlspecialchars($m['vorstands_rolle']) ?>
+                        </p>
+                        <a href="mitglied-details.php?id=<?= $m['id'] ?>&typ=vorstand" class="btn btn-secondary btn-sm"
+                            style="margin-top: 10px;">Kontakt & Info</a>
                     </div>
-                    <h2>Erika Musterfrau</h2>
-                    <p><strong>2. Vorsitzende</strong></p>
-                    <p style="font-size: 0.9rem; color: #666; margin: 10px 0;">Stellvertretende Leitung und
-                        Projektkoordination.</p>
-                    <a href="mitglied-details.php?id=2&typ=vorstand" class="read-more">Kontakt & Info</a>
-                </article>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Aktuell sind keine Vorstandsmitglieder hinterlegt.</p>
+        <?php endif; ?>
 
-                <article class="news-card" style="text-align: center;">
-                    <div class="profile-preview-circle">
-                        <img src="https://via.placeholder.com/150" alt="Schatzmeister">
-                    </div>
-                    <h2>Lukas Lohngeld</h2>
-                    <p><strong>Schatzmeister</strong></p>
-                    <p style="font-size: 0.9rem; color: #666; margin: 10px 0;">Verantwortlich für Finanzen und
-                        Mitgliederverwaltung.</p>
-                    <a href="mitglied-details.php?id=3&typ=vorstand" class="read-more">Kontakt & Info</a>
-                </article>
-
-            </div>
-        </main>
     </div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-
-</div>
-</body>
-
-</html>
+</main>
+<?php
+// 3. FOOTER EINBINDEN
+require_once __DIR__ . '/../../templates/footer.php';
+?>

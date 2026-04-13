@@ -1,48 +1,76 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-include $_SERVER['DOCUMENT_ROOT'] . '/db.php';
+// 1. ZUGRIFFSPRÜFUNG
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+    die("Zugriff verweigert.");
+}
+
+require_once __DIR__ . '/../../../db.php';
 
 $id = (int) ($_GET['id'] ?? 0);
 
 $stmt = $pdo->prepare("SELECT * FROM news WHERE id = ?");
 $stmt->execute([$id]);
-$news = $stmt->fetch();
+$news = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$news) {
+    die("News nicht gefunden.");
+}
 
 $pageTitle = "News bearbeiten";
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
+require_once __DIR__ . '/../../../templates/header.php';
+require_once __DIR__ . '/../../../templates/navigation.php';
 ?>
 
-<div id="page-wrapper">
-    <div class="container">
+<main>
+    <h2>News bearbeiten</h2>
 
-        <main class="content">
-            <h1>News bearbeiten</h1>
-
-            <form action="/pages/admin/news/aktualisieren.php" method="POST" enctype="multipart/form-data">
-
-                <input type="hidden" name="id" value="<?= $news['id']; ?>">
-
-                <label>Titel</label>
-                <input type="text" name="titel" value="<?= htmlspecialchars($news['titel']); ?>" required>
-
-                <label>Inhalt</label>
-                <textarea name="inhalt" id="editor"><?= $news['inhalt']; ?></textarea>
-
-                <label>Neue Bilder (optional)</label>
-                <input type="file" name="bilder[]" multiple>
-
-                <button type="submit" class="btn-primary">Aktualisieren</button>
-            </form>
-
-            <script>
-                CKEDITOR.replace('editor');
-            </script>
-
-        </main>
-
+    <div class="action-bar">
+        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-</div>
+    <form action="aktualisieren.php" method="POST" enctype="multipart/form-data" class="content-tile"
+        style="max-width: 800px;">
+        <input type="hidden" name="id" value="<?= $news['id']; ?>">
+
+        <div class="form-group">
+            <label for="titel">Titel:</label>
+            <input type="text" id="titel" name="titel" class="form-control"
+                value="<?= htmlspecialchars($news['titel']); ?>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="inhalt">Text:</label>
+            <textarea id="editor" name="inhalt"
+                class="form-control"><?= htmlspecialchars($news['inhalt']); ?></textarea>
+        </div>
+
+        <div class="file-upload-box">
+            <label for="bilder">Weitere Bilder hinzufügen (Optional):</label>
+            <input type="file" id="bilder" name="bilder[]" multiple accept=".jpg, .jpeg, .png, .webp"
+                class="form-control" style="border: none; padding: 0;">
+            <small style="color: #666; display: block; margin-top: 5px;">Erlaubt: JPG, PNG, WEBP. Max. 5MB pro
+                Bild.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary"
+            style="margin-top: 15px; font-size: 1.1rem; padding: 12px 20px;">Änderungen speichern</button>
+    </form>
+
+    <script>
+        CKEDITOR.replace('editor', {
+            height: 400,
+            language: 'de'
+        });
+    </script>
+</main>
+
+<?php require_once __DIR__ . '/../../../templates/footer.php'; ?>

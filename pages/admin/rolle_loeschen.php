@@ -1,10 +1,15 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../db.php';
 
-if (!in_array('admin', $_SESSION['rollen'])) {
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+if (!in_array('admin', $_SESSION['roles'] ?? [])) {
     die("Kein Zugriff.");
 }
+
+require_once __DIR__ . '/../../db.php';
 
 $id = $_GET['id'] ?? 0;
 

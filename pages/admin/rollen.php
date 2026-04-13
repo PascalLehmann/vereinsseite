@@ -35,9 +35,10 @@ $rollen = $pdo->query("SELECT * FROM roles ORDER BY id ASC")->fetchAll();
                 <td><?= $r['id'] ?></td>
                 <td><?= htmlspecialchars($r['name']) ?></td>
                 <td>
-                    <a href="rollen_bearbeiten.php?id=<?= $r['id'] ?>">Bearbeiten</a> |
-                    <a href="rollen_loeschen.php?id=<?= $r['id'] ?>"
-                        onclick="return confirm('Wirklich löschen?')">Löschen</a>
+                    <a href="rollen_bearbeiten.php?id=<?= $r['id'] ?>" class="action-link" title="Bearbeiten"><i
+                            class="fas fa-edit"></i></a>
+                    <a href="rollen_loeschen.php?id=<?= $r['id'] ?>" class="delete-link" title="Löschen"
+                        onclick="return confirm('Wirklich löschen?')"><i class="fas fa-trash"></i></a>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -1,8 +1,16 @@
 <?php
-ini_set('display_errors', 1);
+session_start();
+// Fehlerberichterstattung für die Entwicklung
 error_reporting(E_ALL);
-$pageTitle = "Unser Team";
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php'; ?>
+ini_set('display_errors', 1);
+
+// 1. DATENBANK EINBINDEN (2 Ebenen nach oben ins Hauptverzeichnis)
+require_once __DIR__ . '/../../db.php';
+
+// 2. LAYOUT EINBINDEN
+require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
+?>
 
 <div id="page-wrapper">
     <div class="container">
@@ -25,11 +33,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php'; ?>
                 </div>
             </div>
         </main>
-    </div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
-
-</div>
-
-</body>
-
-</html>
+        <?php
+        // 3. FOOTER EINBINDEN
+        require_once __DIR__ . '/../../templates/footer.php';
+        ?>

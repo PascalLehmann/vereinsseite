@@ -25,30 +25,59 @@ require_once __DIR__ . '/../../templates/header.php';
 
     <hr>
 
-    <h3>Aktionen</h3>
-    <ul class="admin-menu">
+    <?php
+    // --- CONTENT BEREICH ---
+    // Admin und Autor dürfen News und Termine verwalten
+    if ($isAdmin || $isAutor):
+        ?>
+        <div class="dashboard-section">
+            <h3>Inhalte & Verein</h3>
+            <div class="dashboard-grid">
+                <a href="news/übersicht.php" class="dashboard-tile">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News verwalten</span>
+                </a>
+                <a href="termine/übersicht.php" class="dashboard-tile">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Termine verwalten</span>
+                </a>
+                <a href="gegner/übersicht.php" class="dashboard-tile">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Gegner verwalten</span>
+                </a>
+            </div>
+        </div>
+    <?php endif; ?>
 
-        <?php
-        // --- CONTENT BEREICH ---
-        // Admin und Autor dürfen News und Termine verwalten
-        if ($isAdmin || $isAutor):
-            ?>
-            <li><a href="news/übersicht.php">News verwalten</a></li>
-            <li><a href="/pages/admin/termine/übersicht.php">Termine verwalten</a></li>
-            <li><a href="gegner/übersicht.php">Gegner verwalten</a></li>
-        <?php endif; ?>
+    <?php
+    // --- SYSTEM BEREICH ---
+    // Nur der Admin darf Mitglieder und Rollen verwalten
+    if ($isAdmin):
+        ?>
+        <div class="dashboard-section">
+            <h3>System & Verwaltung</h3>
+            <div class="dashboard-grid">
+                <a href="mitglieder/übersicht.php" class="dashboard-tile">
+                    <i class="fas fa-users"></i>
+                    <span>Mitgliederverwaltung</span>
+                </a>
+                <a href="rollen.php" class="dashboard-tile">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Rollenverwaltung</span>
+                </a>
+            </div>
+        </div>
+    <?php endif; ?>
 
-        <?php
-        // --- SYSTEM BEREICH ---
-        // Nur der Admin darf Mitglieder und Rollen verwalten
-        if ($isAdmin):
-            ?>
-            <li><a href="mitglieder/übersicht.php">Mitgliederverwaltung</a></li>
-            <li><a href="rollen.php">Rollenverwaltung</a></li>
-        <?php endif; ?>
-
-        <li><a href="logout.php" style="color: red;">Ausloggen</a></li>
-    </ul>
+    <div class="dashboard-section">
+        <h3>Konto</h3>
+        <div class="dashboard-grid">
+            <a href="logout.php" class="dashboard-tile logout-tile">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Ausloggen</span>
+            </a>
+        </div>
+    </div>
 </main>
 
 <?php require_once __DIR__ . '/../../templates/footer.php'; ?>

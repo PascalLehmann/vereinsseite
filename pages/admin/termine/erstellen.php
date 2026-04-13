@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $heimspiel = isset($_POST['heimspiel']) ? 1 : 0;
     $gegner_id = setNullIfEmpty($_POST['gegner_id'] ?? null);
     $treffpunkt_zeit = setNullIfEmpty($_POST['treffpunkt_zeit'] ?? null);
+    $treffpunkt_ort = setNullIfEmpty($_POST['treffpunkt_ort'] ?? null);
 
     // Kader (S1-S6, A1-A3, Spielführer)
     $s1 = setNullIfEmpty($_POST['s1'] ?? null);
@@ -61,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $sql = "INSERT INTO termine 
-                    (typ, titel, veranstaltungsart, termin_datum, uhrzeit, treffpunkt_zeit, heimspiel, gegner_id, ort, beschreibung, s1, s2, s3, s4, s5, s6, a1, a2, a3, spielfuehrer_id) 
+                    (typ, titel, veranstaltungsart, termin_datum, uhrzeit, treffpunkt_zeit, treffpunkt_ort, heimspiel, gegner_id, ort, beschreibung, s1, s2, s3, s4, s5, s6, a1, a2, a3, spielfuehrer_id) 
                     VALUES 
-                    (:typ, :titel, :veranstaltungsart, :termin_datum, :uhrzeit, :treffpunkt_zeit, :heimspiel, :gegner_id, :ort, :beschreibung, :s1, :s2, :s3, :s4, :s5, :s6, :a1, :a2, :a3, :spielfuehrer_id)";
+                    (:typ, :titel, :veranstaltungsart, :termin_datum, :uhrzeit, :treffpunkt_zeit, :treffpunkt_ort, :heimspiel, :gegner_id, :ort, :beschreibung, :s1, :s2, :s3, :s4, :s5, :s6, :a1, :a2, :a3, :spielfuehrer_id)";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':termin_datum' => $termin_datum,
                 ':uhrzeit' => $uhrzeit,
                 ':treffpunkt_zeit' => $treffpunkt_zeit,
+                ':treffpunkt_ort' => $treffpunkt_ort,
                 ':heimspiel' => $heimspiel,
                 ':gegner_id' => $gegner_id,
                 ':ort' => $ort,
@@ -161,14 +163,19 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>
-                        <input type="checkbox" name="heimspiel" value="1" checked
+                        <input type="checkbox" id="heimspiel_checkbox" name="heimspiel" value="1" checked
                             style="transform: scale(1.5); margin-right: 10px;">
                         <strong>Heimspiel</strong>
                     </label>
                 </div>
                 <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                    <label for="treffpunkt_zeit">Treffpunkt (falls abweichend)</label>
+                    <label for="treffpunkt_zeit">Treffpunkt (Uhrzeit)</label>
                     <input type="time" id="treffpunkt_zeit" name="treffpunkt_zeit" class="form-control">
+                </div>
+                <div class="form-group" id="treffpunkt_ort_container" style="flex: 1; margin-bottom: 0; display: none;">
+                    <label for="treffpunkt_ort">Treffpunkt (Ort)</label>
+                    <input type="text" id="treffpunkt_ort" name="treffpunkt_ort" class="form-control"
+                        placeholder="z.B. Vereinsheim">
                 </div>
             </div>
 
@@ -257,6 +264,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
         const $typSelect = $('#typ');
         const $bereichSpiel = $('#bereich-spiel');
         const $bereichVeranstaltung = $('#bereich-veranstaltung');
+        const $heimspielCheckbox = $('#heimspiel_checkbox');
+        const $treffpunktOrtContainer = $('#treffpunkt_ort_container');
 
         function toggleBereiche() {
             if ($typSelect.val() === 'spiel') {
@@ -268,11 +277,21 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             }
         }
 
+        function toggleTreffpunkt() {
+            if ($heimspielCheckbox.is(':checked')) {
+                $treffpunktOrtContainer.slideUp();
+            } else {
+                $treffpunktOrtContainer.slideDown();
+            }
+        }
+
         // Beim Start einmal ausführen
         toggleBereiche();
+        toggleTreffpunkt();
 
         // Bei jeder Änderung im Dropdown ausführen
         $typSelect.on('change', toggleBereiche);
+        $heimspielCheckbox.on('change', toggleTreffpunkt);
     });
 </script>
 

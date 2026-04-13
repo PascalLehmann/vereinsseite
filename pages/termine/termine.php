@@ -1,11 +1,11 @@
 <?php
 session_start();
-include_once $_SERVER['DOCUMENT_ROOT'] . '/db.php';
+require_once __DIR__ . '/../../db.php';
 $pageTitle = "Termine & Spieltage";
 
 // Header & Navigation (angepasst an unsere Architektur)
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/templates/navigation.php';
+require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
 
 // SQL-Abfrage: Wir verknüpfen den Termin mit dem Gegner
 $sql = "SELECT t.*, g.name AS gegner_name, g.strasse, g.plz, g.ort AS gegner_ort 
@@ -53,7 +53,7 @@ function getSpielerInfo($id, $pdo)
                         <?php if ($t['typ'] === 'spiel'): ?>
                             <h3 style="margin-bottom: 5px; font-size: 1.4rem;">
                                 SKV 9 Killers vs.
-                                <?= htmlspecialchars($t['gegner_name']) ?>
+                                <?= htmlspecialchars($t['gegner_name'] ?? '') ?>
                             </h3>
                             <p
                                 style="color: <?= ($t['heimspiel'] ? '#e67e22' : '#3498db') ?>; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px;">
@@ -83,14 +83,14 @@ function getSpielerInfo($id, $pdo)
 
                         <?php else: ?>
                             <h3 style="margin-bottom: 5px; font-size: 1.4rem;">
-                                <?= htmlspecialchars($t['titel'] ?: $t['veranstaltungsart']) ?>
+                                <?= htmlspecialchars($t['titel'] ?: ($t['veranstaltungsart'] ?? '')) ?>
                             </h3>
                             <p style="margin-bottom: 10px; color: #555;">
-                                <?= nl2br(htmlspecialchars($t['beschreibung'])) ?>
+                                <?= nl2br(htmlspecialchars($t['beschreibung'] ?? '')) ?>
                             </p>
                             <p style="font-size: 0.95rem; color: #555;">
                                 <strong><i class="fa-solid fa-location-dot"></i> Ort/Treffpunkt:</strong>
-                                <?= htmlspecialchars($t['ort']) ?>
+                                <?= htmlspecialchars($t['ort'] ?? '') ?>
                             </p>
                         <?php endif; ?>
                     </div>
@@ -125,8 +125,7 @@ function getSpielerInfo($id, $pdo)
                                     ?>
                                     <div class="spieler-card">
                                         <div class="spieler-avatar">
-                                            <img src="<?= htmlspecialchars($s['profilbild']) ?>" alt="Spieler">
-
+                                                <img src="<?= !empty($s['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($s['profilbild']) : '/assets/img/default-user.png' ?>" alt="Spieler">
                                             <?php if ($s_id == $t['spielfuehrer_id']): ?>
                                                 <div title="Spielführer" class="spielfuehrer-badge">
                                                     <i class="fa-solid fa-star"></i>
@@ -158,4 +157,4 @@ function getSpielerInfo($id, $pdo)
     }
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php'; ?>
+<?php require_once __DIR__ . '/../../templates/footer.php'; ?>

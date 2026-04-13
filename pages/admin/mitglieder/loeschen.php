@@ -1,19 +1,35 @@
 <?php
-include_once '../auth.php';
-checkLogin();
-include_once '../../db.php';
+session_start();
+
+// 1. ZUGRIFFSPRÜFUNG
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles)) {
+    die("Zugriff verweigert.");
+}
+
+require_once __DIR__ . '/../../../db.php';
 
 if (isset($_GET['id'])) {
+    $id = (int) $_GET['id'];
+
     // Optional: Altes Bild vom Server löschen
     $stmt = $pdo->prepare("SELECT profilbild FROM mitglieder WHERE id = ?");
-    $stmt->execute([$_GET['id']]);
+    $stmt->execute([$id]);
     $bild = $stmt->fetchColumn();
-    if ($bild && file_exists("../../img/mitglieder/" . $bild)) {
-        unlink("../../img/mitglieder/" . $bild);
+
+    if ($bild) {
+        $filePath = __DIR__ . '/../../../assets/img/mitglieder/' . $bild;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 
     $stmt = $pdo->prepare("DELETE FROM mitglieder WHERE id = ?");
-    $stmt->execute([$_GET['id']]);
+    $stmt->execute([$id]);
 }
-header("Location: übersicht.php");
+header("Location: übersicht.php?deleted=1");
 exit;

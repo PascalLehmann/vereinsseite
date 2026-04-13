@@ -25,6 +25,10 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <li><a href="/pages/galerie/galerie.php">🖼 Galerie</a></li>
-        <li><a href="/pages/admin/login.php">🔒 Admin Login</a></li>
+
+        <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
+            <!-- Dieser Menüpunkt ist nur für eingeloggte User sichtbar -->
+            <li><a href="/pages/admin/dashboard.php" style="color: #ffffff;">⚙️ Admin-Dashboard</a></li>
+        <?php endif; ?>
     </ul>
 </nav>

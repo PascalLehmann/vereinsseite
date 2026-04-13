@@ -9,6 +9,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// 1b. ROLLENPRÜFUNG (Sicherheit: Nur Admin oder Autor)
+$roles = $_SESSION['roles'] ?? [];
+if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+    header("Location: ../dashboard.php");
+    exit;
+}
+
 // 2. DATENBANK & LAYOUT EINBINDEN
 require_once __DIR__ . '/../../../db.php';
 require_once __DIR__ . '/../../../templates/header.php';
@@ -19,7 +26,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Termine verwalten</h2>
 
     <div class="action-bar">
-        <a href="erstellen.php" class="btn btn-primary">+ Neuen Termin anlegen</a>
+        <a href="erstellen.php" class="btn btn-secondary">+ Neuen Termin anlegen</a>
     </div>
 
     <?php if (isset($_GET['success'])): ?>
@@ -74,8 +81,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
                         // 4. Aktionen (Buttons)
                         echo "<td>";
-                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link'>Bearbeiten</a>";
-                        echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' onclick='return confirm(\"Wirklich löschen?\");'>Löschen</a>";
+                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
                         echo "</td>";
 
                         echo "</tr>";
