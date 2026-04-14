@@ -26,7 +26,10 @@ require_once __DIR__ . '/../../templates/navigation.php';
     <?php
     try {
         // A) Die spezifische News abfragen
-        $sql = "SELECT titel, inhalt, erstellt_am FROM news WHERE id = :id";
+        $sql = "SELECT n.titel, n.inhalt, n.erstellt_am, u.username as autor_name 
+                FROM news n 
+                LEFT JOIN users u ON n.autor_id = u.id 
+                WHERE n.id = :id AND n.is_deleted = 0";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([':id' => $news_id]);
         $news = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -34,9 +37,10 @@ require_once __DIR__ . '/../../templates/navigation.php';
         if ($news) {
             echo "<article class='content-tile'>";
 
-            // Titel und Datum
+            // Titel, Datum und Autor
             echo "<h2 style='margin-bottom: 5px;'>" . htmlspecialchars($news['titel']) . "</h2>";
-            echo "<small style='color: #6b7280; display: block; margin-bottom: 20px;'>Veröffentlicht am: " . date('d.m.Y H:i', strtotime($news['erstellt_am'])) . "</small>";
+            $autor = !empty($news['autor_name']) ? htmlspecialchars($news['autor_name']) : 'Unbekannt';
+            echo "<small style='color: #6b7280; display: block; margin-bottom: 20px;'><i class='fas fa-calendar-alt'></i> " . date('d.m.Y H:i', strtotime($news['erstellt_am'])) . " Uhr &nbsp;|&nbsp; <i class='fas fa-user'></i> " . $autor . "</small>";
 
             // B) Der Hauptinhalt vom CKEditor
             echo "<div class='news-content'>";

@@ -1,22 +1,13 @@
 <?php
 session_start();
-
-// 1. ZUGRIFFSPRÜFUNG
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ../login.php");
-    exit;
-}
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin']) && empty($perms['termine'])) {
     die("Zugriff verweigert.");
 }
-
 require_once __DIR__ . '/../../../db.php';
-
-if (isset($_GET['id'])) {
-    $stmt = $pdo->prepare("DELETE FROM termine WHERE id = ?");
-    $stmt->execute([$_GET['id']]);
+$id = $_GET['id'] ?? 0;
+if ($id) {
+    $pdo->prepare("UPDATE termine SET is_deleted = 1 WHERE id = ?")->execute([$id]);
 }
-
-header("Location: übersicht.php?deleted=1");
+header("Location: übersicht.php");
 exit;

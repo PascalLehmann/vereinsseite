@@ -68,7 +68,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <script>
         CKEDITOR.replace('editor', {
             height: 400,
-            language: 'de'
+            language: 'de',
+            versionCheck: false
         });
     </script>
 </main>

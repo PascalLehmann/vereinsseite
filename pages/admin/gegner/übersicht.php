@@ -23,6 +23,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Gegner verwalten</h2>
 
     <div class="action-bar">
+        <a href="../dashboard.php" class="btn btn-secondary">&larr; Zurück zum Dashboard</a>
         <a href="erstellen.php" class="btn btn-secondary">+ Neuen Gegner anlegen</a>
     </div>
 
@@ -31,6 +32,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <tr>
                 <th>ID</th>
                 <th>Verein</th>
+                <th>Std. Spielzeit</th>
+                <th>Bahnen</th>
                 <th>Aktionen</th>
             </tr>
         </thead>
@@ -45,6 +48,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($g['id']) . "</td>";
                         echo "<td><strong>" . htmlspecialchars($g['name']) . "</strong></td>";
+                        echo "<td>" . (!empty($g['spielzeit']) ? date('H:i', strtotime($g['spielzeit'])) . ' Uhr' : '-') . "</td>";
+                        echo "<td>" . htmlspecialchars($g['bahnen'] ?? '-') . "</td>";
                         echo "<td>";
                         echo "<a href='bearbeiten.php?id=" . $g['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
                         echo "<a href='loeschen.php?id=" . $g['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
@@ -52,10 +57,10 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='3' style='text-align: center;'>Keine Gegner vorhanden.</td></tr>";
+                    echo "<tr><td colspan='5' style='text-align: center;'>Keine Gegner vorhanden.</td></tr>";
                 }
             } catch (PDOException $e) {
-                echo "<tr><td colspan='3' class='alert-error'>Datenbank-Fehler: " . $e->getMessage() . "</td></tr>";
+                echo "<tr><td colspan='5' class='alert-error'>Datenbank-Fehler: " . $e->getMessage() . "</td></tr>";
             }
             ?>
         </tbody>

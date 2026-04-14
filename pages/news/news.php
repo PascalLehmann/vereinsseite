@@ -19,7 +19,11 @@ require_once __DIR__ . '/../../templates/navigation.php';
         <?php
         try {
             // News abfragen (neueste zuerst)
-            $sql = "SELECT id, titel, inhalt, erstellt_am FROM news ORDER BY erstellt_am DESC";
+            $sql = "SELECT n.id, n.titel, n.inhalt, n.erstellt_am, u.username as autor_name 
+                    FROM news n 
+                    LEFT JOIN users u ON n.autor_id = u.id 
+                    WHERE n.is_deleted = 0 
+                    ORDER BY n.erstellt_am DESC";
             $stmt = $pdo->query($sql);
             $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -51,6 +55,11 @@ require_once __DIR__ . '/../../templates/navigation.php';
                     // 2. Textbereich (Titel, Excerpt, Button)
                     echo "<div class='news-preview-text'>";
                     echo "<h3>" . htmlspecialchars($news['titel']) . "</h3>";
+
+                    // Autor und Datum
+                    $autor = !empty($news['autor_name']) ? htmlspecialchars($news['autor_name']) : 'Unbekannt';
+                    $datum = date('d.m.Y', strtotime($news['erstellt_am']));
+                    echo "<small style='color: #6b7280; display: block; margin-bottom: 10px;'><i class='fas fa-user'></i> " . $autor . " &nbsp;|&nbsp; <i class='fas fa-calendar-alt'></i> " . $datum . "</small>";
 
                     // HTML vom CKEditor strippen (entfernen) und Zeilenumbrüche löschen
                     $clean_text = strip_tags($news['inhalt']);

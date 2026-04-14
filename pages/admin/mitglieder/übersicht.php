@@ -9,9 +9,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
-    die("Zugriff verweigert: Nur Administratoren dürfen Mitglieder verwalten.");
+$perms = $_SESSION['permissions'] ?? [];
+$isAdmin = !empty($perms['admin']);
+$canBestleistungen = !empty($perms['bestleistungen']);
+
+if (!$isAdmin && !$canBestleistungen) {
+    die("Zugriff verweigert: Du hast keine Berechtigung für diese Seite.");
 }
 
 // 2. DATENBANK & LAYOUT EINBINDEN
@@ -24,7 +27,10 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Mitglieder verwalten</h2>
 
     <div class="action-bar">
-        <a href="erstellen.php" class="btn btn-secondary">+ Neues Mitglied anlegen</a>
+        <a href="../dashboard.php" class="btn btn-secondary">&larr; Zurück zum Dashboard</a>
+        <?php if ($isAdmin): ?>
+            <a href="erstellen.php" class="btn btn-secondary">+ Neues Mitglied anlegen</a>
+        <?php endif; ?>
     </div>
 
     <table class="admin-table">
@@ -69,7 +75,9 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         // Aktionen
                         echo "<td>";
                         echo "<a href='bearbeiten.php?id=" . $m['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
-                        echo "<a href='loeschen.php?id=" . $m['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
+                        if ($isAdmin) {
+                            echo "<a href='loeschen.php?id=" . $m['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
+                        }
                         echo "</td>";
 
                         echo "</tr>";

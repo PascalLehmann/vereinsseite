@@ -160,7 +160,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <script>
         CKEDITOR.replace('inhalt', {
             height: 300,
-            language: 'de'
+            language: 'de',
+            versionCheck: false
         });
     </script>
 </main>

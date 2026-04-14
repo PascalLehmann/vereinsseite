@@ -32,7 +32,7 @@ if (!$t) {
 
 // Daten für Dropdowns
 $spieler_liste = $pdo->query("SELECT id, vorname, nachname FROM mitglieder ORDER BY vorname, nachname")->fetchAll(PDO::FETCH_ASSOC);
-$gegner_liste = $pdo->query("SELECT id, name FROM gegner ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+$gegner_liste = $pdo->query("SELECT id, name, spielzeit FROM gegner ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = "Termin bearbeiten";
 
@@ -87,7 +87,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <select id="gegner_id" name="gegner_id" class="form-control select2-box" style="width: 100%;">
                     <option value="">-- Bitte wählen --</option>
                     <?php foreach ($gegner_liste as $g): ?>
-                        <option value="<?= $g['id'] ?>" <?= $t['gegner_id'] == $g['id'] ? 'selected' : '' ?>>
+                        <option value="<?= $g['id'] ?>" data-spielzeit="<?= htmlspecialchars($g['spielzeit'] ?? '') ?>" <?= $t['gegner_id'] == $g['id'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($g['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -201,6 +201,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
         const $bereichVeranstaltung = $('#bereich-veranstaltung');
         const $heimspielCheckbox = $('#heimspiel_checkbox');
         const $treffpunktOrtContainer = $('#treffpunkt_ort_container');
+        const $gegnerSelect = $('#gegner_id');
+        const $uhrzeitInput = $('#uhrzeit');
 
         function toggleBereiche() {
             if ($typSelect.val() === 'spiel') {
@@ -220,10 +222,23 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             }
         }
 
+        function checkAutoUhrzeit() {
+            if (!$heimspielCheckbox.is(':checked')) {
+                const selectedOption = $gegnerSelect.find('option:selected');
+                const spielzeit = selectedOption.attr('data-spielzeit');
+                
+                if (spielzeit && spielzeit !== '') {
+                    $uhrzeitInput.val(spielzeit.substring(0, 5));
+                }
+            }
+        }
+
         toggleBereiche();
         toggleTreffpunkt();
         $typSelect.on('change', toggleBereiche);
         $heimspielCheckbox.on('change', toggleTreffpunkt);
+        $gegnerSelect.on('change', checkAutoUhrzeit);
+        $heimspielCheckbox.on('change', checkAutoUhrzeit);
     });
 </script>
 

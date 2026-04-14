@@ -39,6 +39,18 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <label>Vereinsname:</label>
             <input type="text" name="name" class="form-control" required placeholder="z.B. Alle Neune e.V.">
         </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Standard-Spielzeit (Heimspiel des Gegners):</label>
+                <input type="time" name="spielzeit" class="form-control">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Zu spielende Bahnen:</label>
+                <input type="text" name="bahnen" class="form-control" placeholder="z.B. 1-4">
+            </div>
+        </div>
+
         <div style="display:grid; grid-template-columns: 2fr 1fr 2fr; gap:15px;">
             <div class="form-group">
                 <label>Straße:</label>
