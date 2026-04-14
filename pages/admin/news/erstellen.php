@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // WENN ALLES GUT GING: Transaktion bestätigen!
             $pdo->commit();
-            header("Location: übersicht.php?success=1");
+            header("Location: uebersicht.php?success=1");
             exit;
 
         } catch (Exception $e) {
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Neue News erstellen</h2>
 
     <div style="margin-bottom: 20px;">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <?php if ($error): ?>

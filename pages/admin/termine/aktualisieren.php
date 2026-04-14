@@ -57,6 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':id' => (int) $_POST['id']
     ]);
 
-    header("Location: übersicht.php?updated=1");
+    header("Location: uebersicht.php?updated=1");
     exit;
 }

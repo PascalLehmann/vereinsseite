@@ -93,5 +93,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     }
 }
-header("Location: übersicht.php?updated=1");
+header("Location: uebersicht.php?updated=1");
 exit;

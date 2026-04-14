@@ -18,38 +18,20 @@ require_once __DIR__ . '/../../templates/navigation.php';
     <div class="content-tile">
         <div class="news-gallery">
             <?php
-            // =========================================================
-            // HIER KOMMT DEINE LOGIK REIN, UM DIE BILDER ZU LADEN.
-            // =========================================================
-            
-            // BEISPIEL: Alle Bilder aus einem bestimmten Ordner automatisch auslesen
-            $galerieOrdner = __DIR__ . '/../../assets/img/galerie/';
-
-            if (is_dir($galerieOrdner)) {
-                // Sucht alle Bilder (jpg, png, webp) in diesem Ordner
-                $bilder = glob($galerieOrdner . "*.{jpg,jpeg,png,webp,gif}", GLOB_BRACE);
-
+            try {
+                $stmt = $pdo->query("SELECT bild_pfad FROM galerie_bilder ORDER BY hochgeladen_am DESC");
+                $bilder = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
                 if (count($bilder) > 0) {
-                    foreach ($bilder as $bildPfad) {
-                        $bildName = basename($bildPfad);
-                        // Die Klassen 'news-thumbnail' sorgt für den 3D-Hover und die Lightbox-Klickbarkeit!
-                        echo "<img src='/assets/img/galerie/" . htmlspecialchars($bildName) . "' alt='Galerie Bild' class='news-thumbnail'>";
+                    foreach ($bilder as $row) {
+                        echo "<img src='" . htmlspecialchars($row['bild_pfad']) . "' class='news-thumbnail' alt='Galerie Bild'>";
                     }
                 } else {
                     echo "<p>Aktuell sind noch keine Bilder in der Galerie vorhanden.</p>";
                 }
-            } else {
-                echo "<p>Der Galerie-Ordner (/assets/img/galerie/) wurde noch nicht erstellt.</p>";
+            } catch (PDOException $e) {
+                echo "<p class='alert-error'>Fehler beim Laden der Galerie: " . $e->getMessage() . "</p>";
             }
-
-            /*
-             * FALLS DU DIE BILDER AUS DER DATENBANK LÄDST, NUTZE DIESEN CODE-BLOCK STATTDESSEN:
-             * 
-             * $stmt = $pdo->query("SELECT bild_pfad FROM galerie_bilder ORDER BY id DESC");
-             * while ($row = $stmt->fetch()) {
-             *     echo "<img src='" . htmlspecialchars($row['bild_pfad']) . "' class='news-thumbnail' alt='Galerie'>";
-             * }
-             */
             ?>
         </div>
     </div>

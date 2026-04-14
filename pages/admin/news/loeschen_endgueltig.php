@@ -21,5 +21,5 @@ if ($id) {
     $pdo->prepare("DELETE FROM news_bilder WHERE news_id = ?")->execute([$id]);
     $pdo->prepare("DELETE FROM news WHERE id = ?")->execute([$id]);
 }
-header("Location: übersicht.php");
+header("Location: uebersicht.php");
 exit;

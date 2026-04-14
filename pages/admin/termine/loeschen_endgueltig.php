@@ -9,5 +9,5 @@ $id = $_GET['id'] ?? 0;
 if ($id) {
     $pdo->prepare("DELETE FROM termine WHERE id = ?")->execute([$id]);
 }
-header("Location: übersicht.php");
+header("Location: uebersicht.php");
 exit;

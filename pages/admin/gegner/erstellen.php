@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Neuen Gegner anlegen</h2>
 
     <div style="margin-bottom: 20px;">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <form action="speichern.php" method="POST" style="max-width: 600px;">

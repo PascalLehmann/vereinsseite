@@ -21,5 +21,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("UPDATE gegner SET name = ?, strasse = ?, plz = ?, ort = ?, spielzeit = ?, bahnen = ? WHERE id = ?");
     $stmt->execute([$_POST['name'], $_POST['strasse'], $_POST['plz'], $_POST['ort'], $spielzeit, $bahnen, $_POST['id']]);
 }
-header("Location: übersicht.php?updated=1");
+header("Location: uebersicht.php?updated=1");
 exit;

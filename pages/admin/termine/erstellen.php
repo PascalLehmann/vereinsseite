@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':spielfuehrer_id' => $spielfuehrer_id
             ]);
 
-            header("Location: übersicht.php?success=1");
+            header("Location: uebersicht.php?success=1");
             exit;
 
         } catch (PDOException $e) {
@@ -102,7 +102,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // 4. DATEN FÜR DROPDOWNS LADEN (Gegner & Spieler)
 $gegner_liste = $pdo->query("SELECT id, name, spielzeit FROM gegner ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-$spieler_liste = $pdo->query("SELECT id, vorname, nachname FROM mitglieder ORDER BY vorname, nachname")->fetchAll(PDO::FETCH_ASSOC);
+$spieler_liste = $pdo->query("SELECT id, vorname, nachname, vorstands_rolle FROM mitglieder ORDER BY vorname, nachname")->fetchAll(PDO::FETCH_ASSOC);
+
+// 4b. DEFAULT SPIELFÜHRER ERMITTELN (Sportwart oder Vorsitzender)
+$default_spielfuehrer_id = '';
+foreach ($spieler_liste as $s) {
+    if ($s['vorstands_rolle'] === 'Sportwart') {
+        $default_spielfuehrer_id = $s['id'];
+        break;
+    }
+}
+if (!$default_spielfuehrer_id) {
+    foreach ($spieler_liste as $s) {
+        if (in_array($s['vorstands_rolle'], ['1. Vorsitzender', '2. Vorsitzender'])) {
+            $default_spielfuehrer_id = $s['id'];
+            break;
+        }
+    }
+}
 
 // 5. LAYOUT EINBINDEN
 require_once __DIR__ . '/../../../templates/header.php';
@@ -113,7 +130,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Neuen Termin anlegen</h2>
 
     <div class="action-bar">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <?php if ($error): ?>
@@ -155,7 +172,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <select id="gegner_id" name="gegner_id" class="form-control select2-box" style="width: 100%;">
                     <option value="">-- Bitte wählen --</option>
                     <?php foreach ($gegner_liste as $g): ?>
-                        <option value="<?= $g['id'] ?>" data-spielzeit="<?= htmlspecialchars($g['spielzeit'] ?? '') ?>"><?= htmlspecialchars($g['name']) ?></option>
+                        <option value="<?= $g['id'] ?>" data-spielzeit="<?= htmlspecialchars($g['spielzeit'] ?? '') ?>">
+                            <?= htmlspecialchars($g['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -185,7 +203,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <?php for ($i = 1; $i <= 6; $i++): ?>
                     <div class="form-group">
                         <label for="s<?= $i ?>">Spieler <?= $i ?></label>
-                        <select id="s<?= $i ?>" name="s<?= $i ?>" class="form-control select2-box" style="width: 100%;">
+                        <select id="s<?= $i ?>" name="s<?= $i ?>" class="form-control select2-box player-select"
+                            style="width: 100%;">
                             <option value="">- Leer -</option>
                             <?php foreach ($spieler_liste as $s): ?>
                                 <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['vorname'] . ' ' . $s['nachname']) ?>
@@ -201,7 +220,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <?php for ($i = 1; $i <= 3; $i++): ?>
                     <div class="form-group">
                         <label for="a<?= $i ?>">Auswechselspieler <?= $i ?></label>
-                        <select id="a<?= $i ?>" name="a<?= $i ?>" class="form-control select2-box" style="width: 100%;">
+                        <select id="a<?= $i ?>" name="a<?= $i ?>" class="form-control select2-box player-select"
+                            style="width: 100%;">
                             <option value="">- Leer -</option>
                             <?php foreach ($spieler_liste as $s): ?>
                                 <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['vorname'] . ' ' . $s['nachname']) ?>
@@ -217,7 +237,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         style="width: 100%;">
                         <option value="">- Auswählen -</option>
                         <?php foreach ($spieler_liste as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['vorname'] . ' ' . $s['nachname']) ?>
+                            <option value="<?= $s['id'] ?>" <?= $s['id'] == $default_spielfuehrer_id ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($s['vorname'] . ' ' . $s['nachname']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -291,22 +312,48 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             if (!$heimspielCheckbox.is(':checked')) {
                 const selectedOption = $gegnerSelect.find('option:selected');
                 const spielzeit = selectedOption.attr('data-spielzeit');
-                
+
                 if (spielzeit && spielzeit !== '') {
                     $uhrzeitInput.val(spielzeit.substring(0, 5)); // Aus "14:30:00" wird "14:30"
                 }
             }
         }
 
+        // Sperrt bereits gewählte Spieler in den anderen Dropdowns (außer Spielführer!)
+        function updatePlayerDropdowns() {
+            let selectedPlayers = [];
+            $('.player-select').each(function () {
+                let val = $(this).val();
+                if (val) selectedPlayers.push(val);
+            });
+
+            $('.player-select').each(function () {
+                let $select = $(this);
+                let currentVal = $select.val();
+
+                $select.find('option').each(function () {
+                    let val = $(this).val();
+                    if (val && val !== currentVal && selectedPlayers.includes(val)) {
+                        $(this).prop('disabled', true);
+                    } else {
+                        $(this).prop('disabled', false);
+                    }
+                });
+            });
+            $('.player-select').select2({ placeholder: "Bitte wählen...", allowClear: true });
+        }
+
         // Beim Start einmal ausführen
         toggleBereiche();
         toggleTreffpunkt();
+        updatePlayerDropdowns();
 
         // Bei jeder Änderung im Dropdown ausführen
         $typSelect.on('change', toggleBereiche);
         $heimspielCheckbox.on('change', toggleTreffpunkt);
         $gegnerSelect.on('change', checkAutoUhrzeit);
         $heimspielCheckbox.on('change', checkAutoUhrzeit);
+        $('.player-select').on('change', updatePlayerDropdowns);
     });
 </script>
 

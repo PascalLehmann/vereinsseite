@@ -17,5 +17,5 @@ if (isset($_GET['id'])) {
     $stmt = $pdo->prepare("DELETE FROM gegner WHERE id = ?");
     $stmt->execute([$_GET['id']]);
 }
-header("Location: übersicht.php?deleted=1");
+header("Location: uebersicht.php?deleted=1");
 exit;

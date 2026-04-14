@@ -22,7 +22,7 @@ $stmt->execute([$id]);
 $g = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$g) {
-    header("Location: übersicht.php");
+    header("Location: uebersicht.php");
     exit;
 }
 
@@ -35,7 +35,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
 <main>
     <div class="action-bar">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <h2>Gegner bearbeiten</h2>

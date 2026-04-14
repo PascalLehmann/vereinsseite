@@ -8,9 +8,10 @@ require_once __DIR__ . '/../../templates/header.php';
 require_once __DIR__ . '/../../templates/navigation.php';
 
 // SQL-Abfrage: Wir verknüpfen den Termin mit dem Gegner
-$sql = "SELECT t.*, g.name AS gegner_name, g.strasse, g.plz, g.ort AS gegner_ort 
+$sql = "SELECT t.*, g.name AS gegner_name, g.strasse, g.plz, g.ort AS gegner_ort, g.bahnen 
         FROM termine t 
         LEFT JOIN gegner g ON t.gegner_id = g.id 
+        WHERE t.is_deleted = 0
         ORDER BY t.termin_datum ASC";
 $stmt = $pdo->query($sql);
 $termine = $stmt->fetchAll();
@@ -45,7 +46,7 @@ function getSpielerInfo($id, $pdo)
                         </span>
                         <hr style="margin: 8px 0; border: 0; border-top: 1px solid #ddd;">
                         <span class="termin-date-time">
-                            <?= date("H:i", strtotime($t['uhrzeit'])) ?> Uhr
+                            <?= $t['uhrzeit'] ? date("H:i", strtotime($t['uhrzeit'])) . ' Uhr' : 'TBA' ?>
                         </span>
                     </div>
 
@@ -71,13 +72,23 @@ function getSpielerInfo($id, $pdo)
                                         style="color: #3498db; margin-left: 10px; text-decoration: none; font-weight: bold;">
                                         <i class="fa-solid fa-map-location-dot"></i> Maps
                                     </a>
+                                    <?php if (!empty($t['bahnen'])): ?>
+                                        <span style="margin-left: 10px; color: #e67e22;"><i class="fa-solid fa-bowling-ball"></i> Bahnen: <?= htmlspecialchars($t['bahnen']) ?></span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
 
-                            <?php if (!$t['heimspiel'] && $t['treffpunkt_zeit']): ?>
+                            <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">
+                                <strong><i class="fa-solid fa-play"></i> Spielbeginn:</strong>
+                                <?= $t['uhrzeit'] ? date("H:i", strtotime($t['uhrzeit'])) . ' Uhr' : 'Noch nicht bekannt' ?>
+                            </p>
+
+                            <?php if (!$t['heimspiel'] && ($t['treffpunkt_zeit'] || $t['treffpunkt_ort'])): ?>
                                 <p style="font-size: 0.95rem; margin-top: 8px; color: #555;">
-                                    <strong><i class="fa-regular fa-clock"></i> Treffpunkt:</strong>
-                                    <?= date("H:i", strtotime($t['treffpunkt_zeit'])) ?> Uhr
+                                    <strong><i class="fa-solid fa-handshake"></i> Treffpunkt:</strong>
+                                    <?= $t['treffpunkt_zeit'] ? date("H:i", strtotime($t['treffpunkt_zeit'])) . ' Uhr' : '' ?>
+                                    <?= ($t['treffpunkt_zeit'] && $t['treffpunkt_ort']) ? ' - ' : '' ?>
+                                    <?= $t['treffpunkt_ort'] ? htmlspecialchars($t['treffpunkt_ort']) : '' ?>
                                 </p>
                             <?php endif; ?>
 
@@ -125,19 +136,17 @@ function getSpielerInfo($id, $pdo)
                                     ?>
                                     <div class="spieler-card">
                                         <div class="spieler-avatar">
-                                                <img src="<?= !empty($s['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($s['profilbild']) : '/assets/img/default-user.png' ?>" alt="Spieler">
+                                        <img src="<?= !empty($s['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($s['profilbild']) : '/assets/img/mitglieder/default-user.png' ?>" alt="Spieler">
                                             <?php if ($s_id == $t['spielfuehrer_id']): ?>
                                                 <div title="Spielführer" class="spielfuehrer-badge">
                                                     <i class="fa-solid fa-star"></i>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
-                                        <div style="font-weight: bold; font-size: 0.9rem; color: #333;">
-                                            <?= htmlspecialchars($s['vorname']) ?>
-                                        </div>
-                                        <div style="font-size: 0.75rem; color: #999; text-transform: uppercase; margin-top: 3px;">
-                                            <?= $gruppe ?>
-                                        </div>
+                                    <div style="font-weight: bold; font-size: 0.9rem; color: #333; line-height: 1.2;">
+                                        <?= htmlspecialchars($s['vorname']) ?><br>
+                                        <?= htmlspecialchars($s['nachname']) ?>
+                                    </div>
                                     </div>
                                 <?php endforeach;
                             endforeach; ?>

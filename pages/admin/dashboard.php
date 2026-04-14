@@ -37,19 +37,25 @@ require_once __DIR__ . '/../../templates/header.php';
             <h3>Inhalte & Verein</h3>
             <div class="dashboard-grid">
                 <?php if ($canNews): ?>
-                    <a href="news/übersicht.php" class="dashboard-tile">
+                    <a href="news/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-newspaper"></i>
                         <span>News verwalten</span>
                     </a>
                 <?php endif; ?>
                 <?php if ($canTermine): ?>
-                    <a href="termine/übersicht.php" class="dashboard-tile">
+                    <a href="termine/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-calendar-alt"></i>
                         <span>Termine verwalten</span>
                     </a>
                 <?php endif; ?>
+                <?php if ($canNews): ?>
+                    <a href="galerie/uebersicht.php" class="dashboard-tile">
+                        <i class="fas fa-images"></i>
+                        <span>Galerie verwalten</span>
+                    </a>
+                <?php endif; ?>
                 <?php if ($isAdmin): // Gegner vorerst nur für Admins ?>
-                    <a href="gegner/übersicht.php" class="dashboard-tile">
+                    <a href="gegner/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-shield-alt"></i>
                         <span>Gegner verwalten</span>
                     </a>
@@ -67,17 +73,17 @@ require_once __DIR__ . '/../../templates/header.php';
             <h3>System & Verwaltung</h3>
             <div class="dashboard-grid">
                 <?php if ($isAdmin || $canBestleistungen): ?>
-                    <a href="mitglieder/übersicht.php" class="dashboard-tile">
+                    <a href="mitglieder/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-users"></i>
                         <span>Mitgliederverwaltung</span>
                     </a>
                 <?php endif; ?>
                 <?php if ($isAdmin): ?>
-                    <a href="rollen/übersicht.php" class="dashboard-tile">
+                    <a href="rollen/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-user-shield"></i>
                         <span>Rollenverwaltung</span>
                     </a>
-                    <a href="benutzer/übersicht.php" class="dashboard-tile">
+                    <a href="benutzer/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-user-cog"></i>
                         <span>Benutzerverwaltung</span>
                     </a>

@@ -9,5 +9,5 @@ $id = $_GET['id'] ?? 0;
 if ($id) {
     $pdo->prepare("UPDATE news SET is_deleted = 0 WHERE id = ?")->execute([$id]);
 }
-header("Location: übersicht.php");
+header("Location: uebersicht.php");
 exit;

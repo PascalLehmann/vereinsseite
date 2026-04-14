@@ -32,6 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header("Location: /pages/admin/news/übersicht.php");
+    header("Location: /pages/admin/news/uebersicht.php");
     exit;
 }

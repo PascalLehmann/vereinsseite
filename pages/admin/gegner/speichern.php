@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO gegner (name, strasse, plz, ort, spielzeit, bahnen) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$name, $strasse, $plz, $ort, $spielzeit, $bahnen]);
     }
-    header("Location: übersicht.php?success=1");
+    header("Location: uebersicht.php?success=1");
     exit;
 }
-header("Location: übersicht.php");
+header("Location: uebersicht.php");
 exit;

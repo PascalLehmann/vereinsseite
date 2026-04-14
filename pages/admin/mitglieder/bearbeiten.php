@@ -23,7 +23,7 @@ $stmt = $pdo->prepare("SELECT * FROM mitglieder WHERE id = ?");
 $stmt->execute([$id]);
 $m = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$m) {
-    header("Location: übersicht.php");
+    header("Location: uebersicht.php");
     exit;
 }
 
@@ -36,7 +36,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Mitglied bearbeiten: <?= htmlspecialchars($m['vorname'] . " " . $m['nachname']) ?></h2>
 
     <div class="action-bar">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <form action="aktualisieren.php" method="POST" enctype="multipart/form-data" class="content-tile"
@@ -47,12 +47,12 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" style="flex: 1;">
                 <label>Vorname</label>
                 <input type="text" name="vorname" class="form-control" value="<?= htmlspecialchars($m['vorname']) ?>"
- <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?>            required>
+                    <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?> required>
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>Nachname</label>
                 <input type="text" name="nachname" class="form-control" value="<?= htmlspecialchars($m['nachname']) ?>"
- <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?>            required>
+                    <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?> required>
             </div>
         </div>
 

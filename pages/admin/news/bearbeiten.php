@@ -34,7 +34,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>News bearbeiten</h2>
 
     <div class="action-bar">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <form action="aktualisieren.php" method="POST" enctype="multipart/form-data" class="content-tile"

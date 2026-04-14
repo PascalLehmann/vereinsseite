@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        header("Location: übersicht.php?updated=1");
+        header("Location: uebersicht.php?updated=1");
         exit;
     } catch (Exception $e) {
         $pdo->rollBack();

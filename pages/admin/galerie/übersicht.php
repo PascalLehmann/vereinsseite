@@ -25,7 +25,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     </div>
 
     <h2>Galerie verwalten</h2>
-    <p style="margin-bottom: 25px; color: #666;">Hier kannst du Bilder für die öffentliche Galerie hochladen oder löschen.</p>
+    <p style="margin-bottom: 25px; color: #666;">Hier kannst du Bilder für die öffentliche Galerie hochladen oder
+        löschen.</p>
 
     <div class="content-tile">
         <div class="news-gallery">
