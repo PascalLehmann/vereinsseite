@@ -32,16 +32,35 @@ if ($user && password_verify($password, $user['password_hash'])) {
 
     $roles = [];
     $permissions = [
-        'news' => false,
-        'termine' => false,
-        'bestleistungen' => false,
+        'news_create' => false,
+        'news_edit' => false,
+        'news_delete' => false,
+        'news_delete_hard' => false,
+        'termine_create' => false,
+        'termine_edit' => false,
+        'termine_delete' => false,
+        'termine_delete_hard' => false,
+        'mitglieder_create' => false,
+        'mitglieder_edit' => false,
+        'mitglieder_delete' => false,
+        'mitglieder_bestleistungen' => false,
+        'galerie_upload' => false,
+        'galerie_delete' => false,
+        'galerie_delete_hard' => false,
+        'galerie_kat_create' => false,
+        'galerie_kat_delete' => false,
+        'galerie_kat_delete_hard' => false,
         'admin' => false
     ];
 
     try {
         // Wir joinen die Kreuztabelle mit der Rollen-Tabelle
         $sqlRoles = "
-            SELECT r.name, r.perm_news, r.perm_termine, r.perm_bestleistungen, r.perm_admin 
+            SELECT r.name, r.perm_admin,
+                   r.perm_news_create, r.perm_news_edit, r.perm_news_delete, r.perm_news_delete_hard,
+                   r.perm_termine_create, r.perm_termine_edit, r.perm_termine_delete, r.perm_termine_delete_hard,
+                   r.perm_mitglieder_create, r.perm_mitglieder_edit, r.perm_mitglieder_delete, r.perm_mitglieder_bestleistungen, r.perm_galerie_upload, r.perm_galerie_delete, r.perm_galerie_delete_hard,
+                   r.perm_galerie_kat_create, r.perm_galerie_kat_delete, r.perm_galerie_kat_delete_hard
             FROM roles r 
             JOIN user_roles ur ON r.id = ur.role_id 
             WHERE ur.user_id = :user_id
@@ -52,12 +71,44 @@ if ($user && password_verify($password, $user['password_hash'])) {
 
         foreach ($rolesData as $r) {
             $roles[] = $r['name'];
-            if (!empty($r['perm_news']))
-                $permissions['news'] = true;
-            if (!empty($r['perm_termine']))
-                $permissions['termine'] = true;
-            if (!empty($r['perm_bestleistungen']))
-                $permissions['bestleistungen'] = true;
+
+            if (!empty($r['perm_news_create']))
+                $permissions['news_create'] = true;
+            if (!empty($r['perm_news_edit']))
+                $permissions['news_edit'] = true;
+            if (!empty($r['perm_news_delete']))
+                $permissions['news_delete'] = true;
+            if (!empty($r['perm_news_delete_hard']))
+                $permissions['news_delete_hard'] = true;
+            if (!empty($r['perm_termine_create']))
+                $permissions['termine_create'] = true;
+            if (!empty($r['perm_termine_edit']))
+                $permissions['termine_edit'] = true;
+            if (!empty($r['perm_termine_delete']))
+                $permissions['termine_delete'] = true;
+            if (!empty($r['perm_termine_delete_hard']))
+                $permissions['termine_delete_hard'] = true;
+            if (!empty($r['perm_mitglieder_create']))
+                $permissions['mitglieder_create'] = true;
+            if (!empty($r['perm_mitglieder_edit']))
+                $permissions['mitglieder_edit'] = true;
+            if (!empty($r['perm_mitglieder_delete']))
+                $permissions['mitglieder_delete'] = true;
+            if (!empty($r['perm_mitglieder_bestleistungen']))
+                $permissions['mitglieder_bestleistungen'] = true;
+            if (!empty($r['perm_galerie_upload']))
+                $permissions['galerie_upload'] = true;
+            if (!empty($r['perm_galerie_delete']))
+                $permissions['galerie_delete'] = true;
+            if (!empty($r['perm_galerie_kat_create']))
+                $permissions['galerie_kat_create'] = true;
+            if (!empty($r['perm_galerie_kat_delete']))
+                $permissions['galerie_kat_delete'] = true;
+            if (!empty($r['perm_galerie_delete_hard']))
+                $permissions['galerie_delete_hard'] = true;
+            if (!empty($r['perm_galerie_kat_delete_hard']))
+                $permissions['galerie_kat_delete_hard'] = true;
+
             if (!empty($r['perm_admin']))
                 $permissions['admin'] = true;
         }

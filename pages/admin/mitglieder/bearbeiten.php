@@ -10,9 +10,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 $perms = $_SESSION['permissions'] ?? [];
 $isAdmin = !empty($perms['admin']);
-$canBestleistungen = !empty($perms['bestleistungen']);
+$canEditAll = $isAdmin || !empty($perms['mitglieder_edit']);
+$canBestleistungen = $isAdmin || !empty($perms['mitglieder_bestleistungen']);
 
-if (!$isAdmin && !$canBestleistungen) {
+if (!$canEditAll && !$canBestleistungen) {
     die("Zugriff verweigert: Du hast keine Berechtigung für diese Seite.");
 }
 
@@ -47,12 +48,25 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" style="flex: 1;">
                 <label>Vorname</label>
                 <input type="text" name="vorname" class="form-control" value="<?= htmlspecialchars($m['vorname']) ?>"
-                    <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?> required>
+                    <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?> required>
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>Nachname</label>
                 <input type="text" name="nachname" class="form-control" value="<?= htmlspecialchars($m['nachname']) ?>"
-                    <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?> required>
+                    <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?> required>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 15px; margin-bottom: 20px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>E-Mail-Adresse</label>
+                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($m['email'] ?? '') ?>"
+                    <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?>>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Telefonnummer</label>
+                <input type="text" name="telefon" class="form-control"
+                    value="<?= htmlspecialchars($m['telefon'] ?? '') ?>" <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?>>
             </div>
         </div>
 
@@ -62,7 +76,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" name="im_vorstand" id="vorstand_check" value="1"
                         onchange="toggleVorstand(this.checked)" <?= $m['im_vorstand'] ? 'checked' : '' ?>
-                        style="transform: scale(1.5); margin-right: 5px;" <?= !$isAdmin ? 'disabled' : '' ?>>
+                        style="transform: scale(1.5); margin-right: 5px;" <?= !$canEditAll ? 'disabled' : '' ?>>
                     <strong>Ist Mitglied im Vorstand?</strong>
                 </label>
             </div>
@@ -70,7 +84,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" id="vorstand_pos_box"
                 style="display: <?= $m['im_vorstand'] ? 'block' : 'none' ?>; margin-top: 15px;">
                 <label>Vorstands-Position</label>
-                <select name="vorstands_rolle" class="form-control" <?= !$isAdmin ? 'disabled' : '' ?>>
+                <select name="vorstands_rolle" class="form-control" <?= !$canEditAll ? 'disabled' : '' ?>>
                     <option value="">-- Bitte wählen --</option>
                     <?php
                     $rollen = ["1. Vorsitzender", "2. Vorsitzender", "Sportwart", "Kassenwart", "Schriftführer", "Jugendwart"];
@@ -103,19 +117,19 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label>Eintrittsdatum</label>
                 <input type="date" name="eintrittsdatum" class="form-control"
-                    value="<?= htmlspecialchars($m['eintrittsdatum'] ?? '') ?>" <?= !$isAdmin ? 'readonly style="background:#eee;"' : '' ?>>
+                    value="<?= htmlspecialchars($m['eintrittsdatum'] ?? '') ?>" <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?>>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label
                     style="display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; margin-top: 20px;">
                     <input type="checkbox" name="ist_gruendungsmitglied" value="1"
                         <?= !empty($m['ist_gruendungsmitglied']) ? 'checked' : '' ?>
-                        style="transform: scale(1.5); margin-right: 5px;" <?= !$isAdmin ? 'disabled' : '' ?>>
+                        style="transform: scale(1.5); margin-right: 5px;" <?= !$canEditAll ? 'disabled' : '' ?>>
                     <strong style="color: #2980b9;">Gründungsmitglied?</strong>
                 </label>
             </div>
         </div>
-        <?php if ($isAdmin): ?>
+        <?php if ($canEditAll): ?>
             <div class="file-upload-box">
                 <label>Profilbild ändern</label>
                 <input type="file" name="profilbild" accept=".jpg, .jpeg, .png, .webp" class="form-control"

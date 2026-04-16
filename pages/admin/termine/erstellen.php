@@ -8,8 +8,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+$canTermineCreate = !empty($perms['admin']) || !empty($perms['termine_create']);
+if (!$canTermineCreate) {
     die("Zugriff verweigert.");
 }
 
@@ -173,7 +174,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                     <option value="">-- Bitte wählen --</option>
                     <?php foreach ($gegner_liste as $g): ?>
                         <option value="<?= $g['id'] ?>" data-spielzeit="<?= htmlspecialchars($g['spielzeit'] ?? '') ?>">
-                            <?= htmlspecialchars($g['name']) ?></option>
+                            <?= htmlspecialchars($g['name']) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>

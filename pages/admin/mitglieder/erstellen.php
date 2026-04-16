@@ -8,8 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin']) && empty($perms['mitglieder_create'])) {
     die("Zugriff verweigert.");
 }
 
@@ -38,6 +38,17 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" style="flex: 1;">
                 <label>Nachname</label>
                 <input type="text" name="nachname" class="form-control" required>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 15px; margin-bottom: 20px;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>E-Mail-Adresse</label>
+                <input type="email" name="email" class="form-control" placeholder="max@beispiel.de">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Telefonnummer</label>
+                <input type="text" name="telefon" class="form-control" placeholder="0123 4567890">
             </div>
         </div>
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 $perms = $_SESSION['permissions'] ?? [];
-if (empty($perms['admin']) && empty($perms['news'])) {
+if (empty($perms['news_delete'])) {
     die("Zugriff verweigert.");
 }
 require_once __DIR__ . '/../../../db.php';

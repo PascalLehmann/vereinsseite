@@ -9,9 +9,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// 2. Wächter: Nur User mit der Rolle 'admin' dürfen hierher!
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+// 2. Wächter: Nur User mit Admin-Rechten dürfen hierher!
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin'])) {
     die("<div class='alert-error' style='margin: 20px;'>Zugriff verweigert: Du hast keine Administrator-Rechte.</div>");
 }
 
@@ -44,14 +44,20 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 foreach ($db_rollen as $rolle) {
 
                     $rechte = [];
-                    if (!empty($rolle['perm_admin']))
+                    if (!empty($rolle['perm_admin'])) {
                         $rechte[] = "<span style='color:red; font-weight:bold;'>Admin (Alle)</span>";
-                    if (!empty($rolle['perm_news']))
-                        $rechte[] = "News";
-                    if (!empty($rolle['perm_termine']))
-                        $rechte[] = "Termine";
-                    if (!empty($rolle['perm_bestleistungen']))
-                        $rechte[] = "Bestleistungen";
+                    } else {
+                        if (!empty($rolle['perm_news_create']) || !empty($rolle['perm_news_edit']) || !empty($rolle['perm_news_delete']) || !empty($rolle['perm_news_delete_hard']))
+                            $rechte[] = "News";
+                        if (!empty($rolle['perm_termine_create']) || !empty($rolle['perm_termine_edit']) || !empty($rolle['perm_termine_delete']) || !empty($rolle['perm_termine_delete_hard']))
+                            $rechte[] = "Termine";
+                        if (!empty($rolle['perm_mitglieder_create']) || !empty($rolle['perm_mitglieder_edit']) || !empty($rolle['perm_mitglieder_delete']) || !empty($rolle['perm_mitglieder_bestleistungen']))
+                            $rechte[] = "Mitglieder";
+                        if (!empty($rolle['perm_galerie_upload']) || !empty($rolle['perm_galerie_delete']) || !empty($rolle['perm_galerie_delete_hard']))
+                            $rechte[] = "Galerie";
+                        if (!empty($rolle['perm_galerie_kat_create']) || !empty($rolle['perm_galerie_kat_delete']) || !empty($rolle['perm_galerie_kat_delete_hard']))
+                            $rechte[] = "Kategorien";
+                    }
                     $rechte_text = empty($rechte) ? "<em>Keine</em>" : implode(', ', $rechte);
 
                     echo "<tr>";

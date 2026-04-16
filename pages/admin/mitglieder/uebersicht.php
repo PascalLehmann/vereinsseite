@@ -11,9 +11,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $perms = $_SESSION['permissions'] ?? [];
 $isAdmin = !empty($perms['admin']);
-$canBestleistungen = !empty($perms['bestleistungen']);
+$canCreate = $isAdmin || !empty($perms['mitglieder_create']);
+$canEditAll = $isAdmin || !empty($perms['mitglieder_edit']);
+$canDelete = $isAdmin || !empty($perms['mitglieder_delete']);
+$canBestleistungen = $isAdmin || !empty($perms['mitglieder_bestleistungen']);
 
-if (!$isAdmin && !$canBestleistungen) {
+if (!$canCreate && !$canEditAll && !$canDelete && !$canBestleistungen && !$isAdmin) {
     die("Zugriff verweigert: Du hast keine Berechtigung für diese Seite.");
 }
 
@@ -28,7 +31,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
     <div class="action-bar">
         <a href="../dashboard.php" class="btn btn-secondary">&larr; Zurück zum Dashboard</a>
-        <?php if ($isAdmin): ?>
+        <?php if ($canCreate): ?>
             <a href="erstellen.php" class="btn btn-secondary">+ Neues Mitglied anlegen</a>
         <?php endif; ?>
     </div>
@@ -74,8 +77,10 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
                         // Aktionen
                         echo "<td>";
-                        echo "<a href='bearbeiten.php?id=" . $m['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
-                        if ($isAdmin) {
+                        if ($canEditAll || $canBestleistungen) {
+                            echo "<a href='bearbeiten.php?id=" . $m['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        }
+                        if ($canDelete) {
                             echo "<a href='loeschen.php?id=" . $m['id'] . "' class='delete-link' title='Löschen' onclick='return confirm(\"Wirklich löschen?\");'><i class='fas fa-trash'></i></a>";
                         }
                         echo "</td>";

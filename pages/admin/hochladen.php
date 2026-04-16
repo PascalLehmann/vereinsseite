@@ -9,8 +9,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $perms = $_SESSION['permissions'] ?? [];
-if (empty($perms['admin']) && empty($perms['news'])) {
-    die("Zugriff verweigert.");
+if (empty($perms['galerie_upload'])) {
+    die("Zugriff verweigert. Du benötigst das Recht, Bilder hochzuladen.");
 }
 
 require_once __DIR__ . '/../../../db.php';

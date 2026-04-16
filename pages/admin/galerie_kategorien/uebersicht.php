@@ -62,8 +62,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                     echo "<td>";
                     if (!empty($kat['is_deleted'])) { // Nur wer endgültig löschen darf, darf auch wiederherstellen
                         if ($canKatDeleteHard) {
-                            echo "<a href='galerie_kategorien/wiederherstellen.php?id=" . $kat['id'] . "' class='action-link' title='Wiederherstellen' style='color: #2ecc71;'><i class='fas fa-undo'></i></a>";
-                            echo "<a href='galerie_kategorien/loeschen_endgueltig.php?id=" . $kat['id'] . "' class='delete-link' title='Endgültig löschen' onclick='return confirm(\"Kategorie ENDGÜLTIG löschen? Zugehörige Bilder werden nicht gelöscht, aber die Zuordnung geht verloren.\");'><i class='fas fa-trash-alt'></i></a>";
+                            echo "<a href='wiederherstellen.php?id=" . $kat['id'] . "' class='action-link' title='Wiederherstellen' style='color: #2ecc71;'><i class='fas fa-undo'></i></a>";
+                            echo "<a href='loeschen_endgueltig.php?id=" . $kat['id'] . "' class='delete-link' title='Endgültig löschen' onclick='return confirm(\"Kategorie ENDGÜLTIG löschen? Zugehörige Bilder werden nicht gelöscht, aber die Zuordnung geht verloren.\");'><i class='fas fa-trash-alt'></i></a>";
                         }
                     } else {
                         if ($canKatCreate)

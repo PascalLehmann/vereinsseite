@@ -18,11 +18,13 @@ if (session_status() === PHP_SESSION_NONE) {
             <details class="dropdown-menu">
                 <summary>👥 Mitglieder ▼</summary>
                 <ul>
-                    <li><a href="/pages/verein/vorstand.php">Vorstand</a></li>
-                    <li><a href="/pages/verein/spieler.php">Spieler</a></li>
+                    <li><a href="/pages/verein/vorstand.php">👔 Vorstand</a></li>
+                    <li><a href="/pages/verein/spieler.php">🎳 Spieler</a></li>
                 </ul>
             </details>
         </li>
+
+        <li><a href="/pages/verein/bestenliste.php">🏆 Bestenliste</a></li>
 
         <li><a href="/pages/galerie/galerie.php">🖼 Galerie</a></li>
 

@@ -8,8 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin'])) {
     die("Zugriff verweigert.");
 }
 

@@ -9,8 +9,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $perms = $_SESSION['permissions'] ?? [];
-if (empty($perms['admin']) && empty($perms['news'])) {
-    die("Zugriff verweigert.");
+$canGalerieUpload = !empty($perms['galerie_upload']);
+if (!$canGalerieUpload) {
+    die("Zugriff verweigert. Du benötigst das Recht, Bilder hochzuladen.");
 }
 
 require_once __DIR__ . '/../../../db.php';
@@ -21,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_dir = __DIR__ . '/../../../uploads/galerie/';
         if (!is_dir($upload_dir))
             mkdir($upload_dir, 0755, true);
+        $kategorie_id = !empty($_POST['kategorie_id']) ? (int) $_POST['kategorie_id'] : null;
 
         $erlaubte_formate = ['image/jpeg', 'image/png', 'image/webp'];
         $max_size = 5 * 1024 * 1024;
-        $stmtBild = $pdo->prepare("INSERT INTO galerie_bilder (bild_pfad) VALUES (?)");
+        $stmtBild = $pdo->prepare("INSERT INTO galerie_bilder (bild_pfad, kategorie_id) VALUES (?, ?)");
 
         $count = count($_FILES['bilder']['name']);
         for ($i = 0; $i < $count; $i++) {
@@ -45,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $ziel_pfad_db = '/uploads/galerie/' . $neuer_dateiname;
 
                         if (move_uploaded_file($tmp_name, $ziel_pfad_absolut)) {
-                            $stmtBild->execute([$ziel_pfad_db]);
+                            $stmtBild->execute([$ziel_pfad_db, $kategorie_id]);
                         }
                     }
                 }
@@ -57,6 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Bitte wähle mindestens ein Bild aus.";
     }
 }
+
+$kategorien = $pdo->query("SELECT id, name FROM galerie_kategorien WHERE is_deleted = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
 require_once __DIR__ . '/../../../templates/header.php';
 require_once __DIR__ . '/../../../templates/navigation.php';
@@ -72,6 +76,15 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             </p>
         <?php endif; ?>
         <form action="hochladen.php" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Kategorie auswählen:</label>
+                <select name="kategorie_id" class="form-control" required>
+                    <option value="">-- Bitte wählen --</option>
+                    <?php foreach ($kategorien as $k): ?>
+                        <option value="<?= $k['id'] ?>"><?= htmlspecialchars($k['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <div class="file-upload-box">
                 <label>Bilder auswählen (Mehrfachauswahl möglich):</label>
                 <input type="file" name="bilder[]" multiple accept=".jpg, .jpeg, .png, .webp" class="form-control"

@@ -1,8 +1,8 @@
 <?php
 session_start();
 $perms = $_SESSION['permissions'] ?? [];
-if (empty($perms['admin'])) {
-    die("Zugriff verweigert: Nur Admins können News wiederherstellen.");
+if (empty($perms['news_delete_hard'])) {
+    die("Zugriff verweigert: Du benötigst das Recht zum endgültigen Löschen, um News wiederherzustellen.");
 }
 require_once __DIR__ . '/../../../db.php';
 $id = $_GET['id'] ?? 0;

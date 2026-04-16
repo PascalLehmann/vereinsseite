@@ -8,8 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin']) && empty($perms['mitglieder_create'])) {
     die("Zugriff verweigert.");
 }
 
@@ -32,18 +32,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $sql = "INSERT INTO mitglieder (
-                vorname, nachname, im_vorstand, vorstands_rolle, 
+                vorname, nachname, email, telefon, im_vorstand, vorstands_rolle, 
                 ist_gruendungsmitglied,
                 best_100_wert, best_100_datum, best_100_ort,
                 best_120_wert, best_120_datum, best_120_ort,
                 best_200_wert, best_200_datum, best_200_ort,
                 eintrittsdatum, profilbild
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $_POST['vorname'],
         $_POST['nachname'],
+        empty($_POST['email']) ? null : $_POST['email'],
+        empty($_POST['telefon']) ? null : $_POST['telefon'],
         isset($_POST['im_vorstand']) ? 1 : 0,
         empty($_POST['vorstands_rolle']) ? null : $_POST['vorstands_rolle'],
         isset($_POST['ist_gruendungsmitglied']) ? 1 : 0,

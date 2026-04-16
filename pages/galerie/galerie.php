@@ -19,15 +19,31 @@ require_once __DIR__ . '/../../templates/navigation.php';
         <div class="news-gallery">
             <?php
             try {
-                $stmt = $pdo->query("SELECT bild_pfad FROM galerie_bilder ORDER BY hochgeladen_am DESC");
-                $bilder = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                if (count($bilder) > 0) {
-                    foreach ($bilder as $row) {
-                        echo "<img src='" . htmlspecialchars($row['bild_pfad']) . "' class='news-thumbnail' alt='Galerie Bild'>";
+                $stmt = $pdo->query("
+                    SELECT k.id, k.name, 
+                    (SELECT bild_pfad FROM galerie_bilder WHERE kategorie_id = k.id AND is_deleted = 0 ORDER BY hochgeladen_am DESC LIMIT 1) as cover_bild,
+                    (SELECT COUNT(*) FROM galerie_bilder WHERE kategorie_id = k.id AND is_deleted = 0) as bild_anzahl
+                    FROM galerie_kategorien k 
+                    ORDER BY k.name ASC
+                ");
+                $kategorien = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (count($kategorien) > 0) {
+                    foreach ($kategorien as $kat) {
+                        echo "<a href='galerie-details.php?id=" . $kat['id'] . "' style='text-decoration:none; color:inherit;'>";
+                        echo "<div class='content-tile' style='width:250px; padding:10px; text-align:center; transition:transform 0.3s;'>";
+                        if ($kat['cover_bild']) {
+                            echo "<img src='" . htmlspecialchars($kat['cover_bild']) . "' style='width:100%; height:150px; object-fit:cover; border-radius:6px; margin-bottom:10px;'>";
+                        } else {
+                            echo "<div style='width:100%; height:150px; background:#eee; border-radius:6px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:#999;'><i class='fas fa-folder-open fa-3x'></i></div>";
+                        }
+                        echo "<h3 style='margin:0; font-size:1.1rem;'>" . htmlspecialchars($kat['name']) . "</h3>";
+                        echo "<small style='color:#666;'>" . $kat['bild_anzahl'] . " Bilder</small>";
+                        echo "</div>";
+                        echo "</a>";
                     }
                 } else {
-                    echo "<p>Aktuell sind noch keine Bilder in der Galerie vorhanden.</p>";
+                    echo "<p>Aktuell sind noch keine Kategorien vorhanden.</p>";
                 }
             } catch (PDOException $e) {
                 echo "<p class='alert-error'>Fehler beim Laden der Galerie: " . $e->getMessage() . "</p>";
@@ -35,15 +51,6 @@ require_once __DIR__ . '/../../templates/navigation.php';
             ?>
         </div>
     </div>
-
-    <!-- Das unsichtbare Lightbox-Modal für die Vollbild-Ansicht (Wird von script.js gesteuert) -->
-    <div id="imageLightbox" class="news-lightbox-modal">
-        <span class="news-lightbox-close">&times;</span>
-        <div class="news-lightbox-content">
-            <img class="news-lightbox-image" id="lightboxImage" alt="Vergrößerte Ansicht">
-        </div>
-    </div>
-
 </main>
 
 <?php require_once __DIR__ . '/../../templates/footer.php'; ?>

@@ -28,7 +28,7 @@ require_once __DIR__ . '/../../templates/navigation.php';
             $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Prepared Statement für das Thumbnail (LIMIT 1 für optimale Performance)
-            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :news_id ORDER BY id ASC LIMIT 1";
+            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :news_id AND is_deleted = 0 ORDER BY id ASC LIMIT 1";
             $stmtBilder = $pdo->prepare($sqlBilder);
 
             if (count($news_entries) > 0) {

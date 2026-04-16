@@ -51,7 +51,7 @@ require_once __DIR__ . '/../../templates/navigation.php';
             // HIER WAR DER FEHLER: Dieser Block hat gefehlt!
             // C) Die hochgeladenen Bildergalerie abfragen und in $bilder speichern
             // =================================================================
-            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :id ORDER BY id ASC";
+            $sqlBilder = "SELECT bild_pfad FROM news_bilder WHERE news_id = :id AND is_deleted = 0";
             $stmtBilder = $pdo->prepare($sqlBilder);
             $stmtBilder->execute([':id' => $news_id]);
             $bilder = $stmtBilder->fetchAll(PDO::FETCH_COLUMN);

@@ -1,0 +1,20 @@
+<?php
+session_start();
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['galerie_delete_hard'])) {
+    die("Zugriff verweigert. Du benötigst das Recht zum endgültigen Löschen, um Bilder wiederherzustellen.");
+}
+require_once __DIR__ . '/../../../db.php';
+
+$id = $_GET['id'] ?? 0;
+$return_kat = isset($_GET['return_kat']) ? (int) $_GET['return_kat'] : -1;
+
+if ($id) {
+    $pdo->prepare("UPDATE galerie_bilder SET is_deleted = 0 WHERE id = ?")->execute([$id]);
+}
+if ($return_kat >= 0) {
+    header("Location: kategorie_details.php?id=" . $return_kat);
+} else {
+    header("Location: uebersicht.php");
+}
+exit;

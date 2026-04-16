@@ -3,15 +3,20 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// 1. ZUGRIFFSPRÜFUNG
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+
+$perms = $_SESSION['permissions'] ?? [];
+$canTermineEdit = !empty($perms['admin']) || !empty($perms['termine_edit']);
+
+if (!$canTermineEdit) {
     die("Zugriff verweigert.");
 }
+
+// ... hier folgt dann dein restlicher Code
+
 
 require_once __DIR__ . '/../../../db.php';
 

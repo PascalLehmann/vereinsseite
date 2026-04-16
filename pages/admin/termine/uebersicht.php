@@ -11,9 +11,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $perms = $_SESSION['permissions'] ?? [];
 $isAdmin = !empty($perms['admin']);
-$canTermine = $isAdmin || !empty($perms['termine']);
+$canTermineCreate = $isAdmin || !empty($perms['termine_create']);
+$canTermineEdit = $isAdmin || !empty($perms['termine_edit']);
+$canTermineDelete = $isAdmin || !empty($perms['termine_delete']);
 
-if (!$canTermine) {
+if (!$canTermineCreate && !$canTermineEdit && !$canTermineDelete && !$isAdmin) {
     die("Zugriff verweigert: Du hast keine Berechtigung für diese Seite.");
 }
 
@@ -28,7 +30,9 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
     <div class="action-bar">
         <a href="../dashboard.php" class="btn btn-secondary">&larr; Zurück zum Dashboard</a>
-        <a href="erstellen.php" class="btn btn-secondary">+ Neuen Termin anlegen</a>
+        <?php if ($canTermineCreate): ?>
+            <a href="erstellen.php" class="btn btn-secondary">+ Neuen Termin anlegen</a>
+        <?php endif; ?>
     </div>
 
     <?php if (isset($_GET['success'])): ?>
@@ -97,11 +101,13 @@ require_once __DIR__ . '/../../../templates/navigation.php';
 
                         // 4. Aktionen (Buttons)
                         echo "<td>";
-                        echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        if ($canTermineEdit) {
+                            echo "<a href='bearbeiten.php?id=" . $row['id'] . "' class='action-link' title='Bearbeiten'><i class='fas fa-edit'></i></a>";
+                        }
                         if ($row['is_deleted'] && $isAdmin) {
                             echo "<a href='wiederherstellen.php?id=" . $row['id'] . "' class='action-link' title='Wiederherstellen' style='color: #2ecc71;'><i class='fas fa-undo'></i></a>";
                             echo "<a href='loeschen_endgueltig.php?id=" . $row['id'] . "' class='delete-link' title='Endgültig löschen' onclick='return confirm(\"Soll dieser Termin wirklich ENDGÜLTIG gelöscht werden?\");'><i class='fas fa-trash-alt'></i></a>";
-                        } else {
+                        } elseif (!$row['is_deleted'] && $canTermineDelete) {
                             echo "<a href='loeschen.php?id=" . $row['id'] . "' class='delete-link' title='Verstecken / Löschen' onclick='return confirm(\"Wirklich löschen? (Wird für normale User unsichtbar)\");'><i class='fas fa-trash'></i></a>";
                         }
                         echo "</td>";

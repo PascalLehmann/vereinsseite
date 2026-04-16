@@ -14,26 +14,12 @@ require_once __DIR__ . '/../../templates/header.php';
 require_once __DIR__ . '/../../templates/navigation.php';
 
 // 4. VORSTAND AUS DER DATENBANK LADEN
-// Wir sortieren die Mitglieder nach Wichtigkeit des Amtes (1. Vorsitzender zuerst etc.)
-$sql = "SELECT id, vorname, nachname, vorstands_rolle, profilbild 
-        FROM mitglieder 
-        WHERE im_vorstand = 1 
-        ORDER BY 
-            CASE vorstands_rolle
-                WHEN '1. Vorsitzender' THEN 1
-                WHEN '1. Vorsitzende' THEN 1
-                WHEN '2. Vorsitzender' THEN 2
-                WHEN '2. Vorsitzende' THEN 2
-                WHEN 'Schatzmeister' THEN 3
-                WHEN 'Schatzmeisterin' THEN 3
-                WHEN 'Kassenwart' THEN 3
-                WHEN 'Kassenwartin' THEN 3
-                WHEN 'Schriftführer' THEN 4
-                WHEN 'Schriftführerin' THEN 4
-                WHEN 'Sportwart' THEN 5
-                ELSE 99
-            END ASC,
-            nachname ASC";
+// Wir laden die Mitglieder und sortieren sie anhand der Reihenfolge aus der neuen `vorstand_positionen` Tabelle.
+$sql = "SELECT m.* 
+        FROM mitglieder m
+        LEFT JOIN vorstand_positionen p ON m.vorstands_rolle = p.name
+        WHERE m.im_vorstand = 1
+        ORDER BY p.sort_order ASC, m.nachname ASC";
 $vorstand_mitglieder = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
@@ -45,20 +31,45 @@ $vorstand_mitglieder = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     <div class="vorstand-grid">
         <?php if (count($vorstand_mitglieder) > 0): ?>
             <?php foreach ($vorstand_mitglieder as $m): ?>
-                <div class="vorstand-card">
-                    <div class="vorstand-avatar">
-                        <img src="<?= !empty($m['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($m['profilbild']) : '/assets/img/mitglieder/default-user.png' ?>"
-                            alt="<?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?>">
-                    </div>
-                    <div class="vorstand-info">
-                        <h3>
-                            <?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?>
-                        </h3>
-                        <p class="rolle">
-                            <?= htmlspecialchars($m['vorstands_rolle']) ?>
-                        </p>
-                        <a href="mitglied-details.php?id=<?= $m['id'] ?>&typ=vorstand" class="btn btn-secondary btn-sm"
-                            style="margin-top: 10px;">Kontakt & Info</a>
+                <div class="flip-card-outer">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <!-- Externe URL für das Hintergrundbild (wie gewünscht) -->
+                            <div class="flip-card-bkg-photo"
+                                style="background-image: url('https://images.unsplash.com/photo-1511207538754-e8555f2bc187?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=88672068827eaeeab540f584b883cc66&auto=format&fit=crop&w=1164&q=80');">
+                            </div>
+                            <div class="flip-card-face-photo"
+                                style="background-image: url('<?= !empty($m['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($m['profilbild']) : '/assets/img/mitglieder/default-user.png' ?>');">
+                            </div>
+                            <div class="flip-card-text">
+                                <h3><?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?></h3>
+                                <p><?= htmlspecialchars($m['vorstands_rolle']) ?></p>
+                                <span class="flip-card-hover-badge">Infos drehen</span>
+                            </div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-content" style="width: 100%;">
+                                <div class="flip-card-back-stats">
+                                    <p style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #fff;">Kontakt
+                                        & Info</p>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span>E-Mail:</span>
+                                        <strong><?= !empty($m['email']) ? htmlspecialchars($m['email']) : 'Keine Angabe' ?></strong>
+                                    </div>
+                                    <?php if (!empty($m['telefon'])): ?>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Telefon:</span>
+                                            <strong><?= htmlspecialchars($m['telefon']) ?></strong>
+                                        </div>
+                                    <?php endif; ?>
+                                    <hr>
+                                    <p style="font-size: 0.75rem; text-align: center; color: #aaa;">
+                                        Dabei seit:
+                                        <?= !empty($m['eintrittsdatum']) ? date("d.m.Y", strtotime($m['eintrittsdatum'])) : 'Unbekannt' ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>

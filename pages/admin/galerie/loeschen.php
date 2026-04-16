@@ -1,25 +1,28 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
 $perms = $_SESSION['permissions'] ?? [];
-if (empty($perms['admin']) && empty($perms['news'])) {
-    die("Zugriff verweigert.");
+$canGalerieDelete = !empty($perms['galerie_delete']);
+
+if (!$canGalerieDelete) {
+    die("Zugriff verweigert. Du benötigst das Recht, Bilder zu löschen.");
 }
 require_once __DIR__ . '/../../../db.php';
 
 $id = $_GET['id'] ?? 0;
-if ($id) {
-    $stmt = $pdo->prepare("SELECT bild_pfad FROM galerie_bilder WHERE id = ?");
-    $stmt->execute([$id]);
-    $pfad = $stmt->fetchColumn();
+$return_kat = isset($_GET['return_kat']) ? (int) $_GET['return_kat'] : -1;
 
-    if ($pfad) {
-        // Löscht die Datei physisch vom Server
-        $absolut = __DIR__ . '/../../..' . $pfad;
-        if (file_exists($absolut))
-            unlink($absolut);
-        // Löscht den Eintrag aus der Datenbank
-        $pdo->prepare("DELETE FROM galerie_bilder WHERE id = ?")->execute([$id]);
-    }
+if ($id) {
+    $pdo->prepare("UPDATE galerie_bilder SET is_deleted = 1 WHERE id = ?")->execute([$id]);
 }
-header("Location: uebersicht.php");
+if ($return_kat >= 0) {
+    header("Location: kategorie_details.php?id=" . $return_kat);
+} else {
+    header("Location: uebersicht.php");
+}
 exit;

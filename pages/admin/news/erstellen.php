@@ -8,9 +8,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
-    die("Zugriff verweigert.");
+$perms = $_SESSION['permissions'] ?? [];
+$canNewsCreate = !empty($perms['news_create']);
+if (!$canNewsCreate) {
+    die("Zugriff verweigert. Du benötigst das Recht, News zu erstellen.");
 }
 
 // 2. DATENBANK EINBINDEN

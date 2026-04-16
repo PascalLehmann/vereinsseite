@@ -6,8 +6,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+if (empty($perms['admin']) && empty($perms['mitglieder_delete'])) {
     die("Zugriff verweigert.");
 }
 

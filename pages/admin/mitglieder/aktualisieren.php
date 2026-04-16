@@ -10,9 +10,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 $perms = $_SESSION['permissions'] ?? [];
 $isAdmin = !empty($perms['admin']);
-$canBestleistungen = !empty($perms['bestleistungen']);
+$canEditAll = $isAdmin || !empty($perms['mitglieder_edit']);
+$canBestleistungen = $isAdmin || !empty($perms['mitglieder_bestleistungen']);
 
-if (!$isAdmin && !$canBestleistungen) {
+if (!$canEditAll && !$canBestleistungen) {
     die("Zugriff verweigert.");
 }
 
@@ -39,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['profilbild']['tmp_name'], $upload_dir . $bildname);
     }
 
-    if ($isAdmin) {
+    if ($canEditAll) {
         // Admin darf alles ändern
         $sql = "UPDATE mitglieder SET 
-                    vorname = ?, nachname = ?, im_vorstand = ?, vorstands_rolle = ?,
+                    vorname = ?, nachname = ?, email = ?, telefon = ?, im_vorstand = ?, vorstands_rolle = ?,
                     ist_gruendungsmitglied = ?,
                     best_100_wert = ?, best_100_datum = ?, best_100_ort = ?,
                     best_120_wert = ?, best_120_datum = ?, best_120_ort = ?,
@@ -54,6 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([
             $_POST['vorname'],
             $_POST['nachname'],
+            empty($_POST['email']) ? null : $_POST['email'],
+            empty($_POST['telefon']) ? null : $_POST['telefon'],
             isset($_POST['im_vorstand']) ? 1 : 0,
             empty($_POST['vorstands_rolle']) ? null : $_POST['vorstands_rolle'],
             isset($_POST['ist_gruendungsmitglied']) ? 1 : 0,

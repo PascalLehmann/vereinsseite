@@ -8,8 +8,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../login.php");
     exit;
 }
-$roles = $_SESSION['roles'] ?? [];
-if (!in_array('admin', $roles) && !in_array('autor', $roles)) {
+$perms = $_SESSION['permissions'] ?? [];
+$canNewsEdit = !empty($perms['news_edit']);
+if (!$canNewsEdit) {
     die("Zugriff verweigert.");
 }
 
