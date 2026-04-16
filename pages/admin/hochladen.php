@@ -4,13 +4,12 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ../login.php");
+    header("Location: /admin/login");
     exit;
 }
 
 $perms = $_SESSION['permissions'] ?? [];
-$canGalerieUpload = !empty($perms['galerie_upload']);
-if (!$canGalerieUpload) {
+if (empty($perms['galerie_upload'])) {
     die("Zugriff verweigert. Du benötigst das Recht, Bilder hochzuladen.");
 }
 
@@ -22,11 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_dir = __DIR__ . '/../../../uploads/galerie/';
         if (!is_dir($upload_dir))
             mkdir($upload_dir, 0755, true);
-        $kategorie_id = !empty($_POST['kategorie_id']) ? (int) $_POST['kategorie_id'] : null;
 
         $erlaubte_formate = ['image/jpeg', 'image/png', 'image/webp'];
         $max_size = 5 * 1024 * 1024;
-        $stmtBild = $pdo->prepare("INSERT INTO galerie_bilder (bild_pfad, kategorie_id) VALUES (?, ?)");
+        $stmtBild = $pdo->prepare("INSERT INTO galerie_bilder (bild_pfad) VALUES (?)");
 
         $count = count($_FILES['bilder']['name']);
         for ($i = 0; $i < $count; $i++) {
@@ -46,26 +44,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $ziel_pfad_db = '/uploads/galerie/' . $neuer_dateiname;
 
                         if (move_uploaded_file($tmp_name, $ziel_pfad_absolut)) {
-                            $stmtBild->execute([$ziel_pfad_db, $kategorie_id]);
+                            $stmtBild->execute([$ziel_pfad_db]);
                         }
                     }
                 }
             }
         }
-        header("Location: uebersicht.php");
+        header("Location: /admin/galerie");
         exit;
     } else {
         $error = "Bitte wähle mindestens ein Bild aus.";
     }
 }
 
-$kategorien = $pdo->query("SELECT id, name FROM galerie_kategorien WHERE is_deleted = 0 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
-
 require_once __DIR__ . '/../../../templates/header.php';
 require_once __DIR__ . '/../../../templates/navigation.php';
 ?>
 <main>
-    <div class="action-bar"><a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a></div>
+    <div class="action-bar"><a href="/admin/galerie" class="btn btn-secondary">&larr; Zurück zur Übersicht</a></div>
     <h2>Bilder zur Galerie hinzufügen</h2>
 
     <div class="content-tile" style="max-width: 600px;">
@@ -74,16 +70,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <?= htmlspecialchars($error) ?>
             </p>
         <?php endif; ?>
-        <form action="hochladen.php" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Kategorie auswählen:</label>
-                <select name="kategorie_id" class="form-control" required>
-                    <option value="">-- Bitte wählen --</option>
-                    <?php foreach ($kategorien as $k): ?>
-                        <option value="<?= $k['id'] ?>"><?= htmlspecialchars($k['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+        <form action="/admin/hochladen" method="POST" enctype="multipart/form-data">
             <div class="file-upload-box">
                 <label>Bilder auswählen (Mehrfachauswahl möglich):</label>
                 <input type="file" name="bilder[]" multiple accept=".jpg, .jpeg, .png, .webp" class="form-control"

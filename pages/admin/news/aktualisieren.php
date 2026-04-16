@@ -54,9 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($size > $max_size)
                         throw new Exception("Ein Bild ist größer als 5MB.");
 
-                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $mime_type = finfo_file($finfo, $tmp_name);
-                    finfo_close($finfo);
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mime_type = $finfo->file($tmp_name);
                     if (!in_array($mime_type, $erlaubte_formate))
                         throw new Exception("Falsches Format.");
 

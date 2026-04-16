@@ -76,9 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
 
                         // 2. Check: Echter Datei-Typ (nicht nur die Endung raten!)
-                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                        $mime_type = finfo_file($finfo, $tmp_name);
-                        finfo_close($finfo);
+                        $finfo = new finfo(FILEINFO_MIME_TYPE);
+                        $mime_type = $finfo->file($tmp_name);
 
                         if (!in_array($mime_type, $erlaubte_formate)) {
                             throw new Exception("Falsches Dateiformat. Nur JPG, PNG und WEBP sind erlaubt.");
