@@ -120,6 +120,15 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                     value="<?= htmlspecialchars($m['eintrittsdatum'] ?? '') ?>" <?= !$canEditAll ? 'readonly style="background:#eee;"' : '' ?>>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Spielerstatus</label>
+                <select name="ist_aktiv" class="form-control" <?= !$canEditAll ? 'disabled' : '' ?>>
+                    <option value="1" <?= (!isset($m['ist_aktiv']) || $m['ist_aktiv'] == 1) ? 'selected' : '' ?>>Aktiv
+                        (kann spielen)</option>
+                    <option value="0" <?= (isset($m['ist_aktiv']) && $m['ist_aktiv'] == 0) ? 'selected' : '' ?>>Passiv
+                    </option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label
                     style="display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; margin-top: 20px;">
                     <input type="checkbox" name="ist_gruendungsmitglied" value="1"

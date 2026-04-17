@@ -31,5 +31,5 @@ if (isset($_GET['id'])) {
     $stmt = $pdo->prepare("DELETE FROM mitglieder WHERE id = ?");
     $stmt->execute([$id]);
 }
-header("Location: übersicht.php?deleted=1");
+header("Location: uebersicht.php?deleted=1");
 exit;

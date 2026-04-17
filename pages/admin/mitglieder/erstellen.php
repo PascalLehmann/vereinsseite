@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     <h2>Neues Mitglied anlegen</h2>
 
     <div class="action-bar">
-        <a href="übersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
+        <a href="uebersicht.php" class="btn btn-secondary">&larr; Zurück zur Übersicht</a>
     </div>
 
     <form action="speichern.php" method="POST" enctype="multipart/form-data" class="content-tile"
@@ -94,6 +94,13 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label>Eintrittsdatum</label>
                 <input type="date" name="eintrittsdatum" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Spielerstatus</label>
+                <select name="ist_aktiv" class="form-control">
+                    <option value="1">Aktiv (kann spielen)</option>
+                    <option value="0">Passiv</option>
+                </select>
             </div>
             <div class="form-group" style="flex: 1; margin-bottom: 0;">
                 <label

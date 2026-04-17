@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Admin darf alles ändern
         $sql = "UPDATE mitglieder SET 
                     vorname = ?, nachname = ?, email = ?, telefon = ?, im_vorstand = ?, vorstands_rolle = ?,
-                    ist_gruendungsmitglied = ?,
+                    ist_gruendungsmitglied = ?, ist_aktiv = ?,
                     best_100_wert = ?, best_100_datum = ?, best_100_ort = ?,
                     best_120_wert = ?, best_120_datum = ?, best_120_ort = ?,
                     best_200_wert = ?, best_200_datum = ?, best_200_ort = ?,
@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             isset($_POST['im_vorstand']) ? 1 : 0,
             empty($_POST['vorstands_rolle']) ? null : $_POST['vorstands_rolle'],
             isset($_POST['ist_gruendungsmitglied']) ? 1 : 0,
+            isset($_POST['ist_aktiv']) ? (int) $_POST['ist_aktiv'] : 1,
             empty($_POST['best_100_wert']) ? null : $_POST['best_100_wert'],
             empty($_POST['best_100_datum']) ? null : $_POST['best_100_datum'],
             empty($_POST['best_100_ort']) ? null : $_POST['best_100_ort'],

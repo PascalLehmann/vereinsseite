@@ -31,6 +31,13 @@ $mitglieder = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC")->fet
                             </div>
                         <?php endif; ?>
 
+                        <?php if (isset($m['ist_aktiv']) && $m['ist_aktiv'] == 0): ?>
+                            <div
+                                style="position: absolute; top: 10px; left: 10px; background: #e74c3c; color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; z-index: 10;">
+                                PASSIV
+                            </div>
+                        <?php endif; ?>
+
                         <!-- Externe URL für das Hintergrundbild (wie gewünscht) -->
                         <div class="flip-card-bkg-photo"
                             style="background-image: url('https://images.unsplash.com/photo-1511207538754-e8555f2bc187?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=88672068827eaeeab540f584b883cc66&auto=format&fit=crop&w=1164&q=80');">

@@ -38,7 +38,8 @@ require_once __DIR__ . '/../../templates/navigation.php';
         <div>
             <h1 style="margin-bottom: 5px;"><?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?></h1>
             <p style="font-size: 1.2rem; color: var(--sidebar-color); font-weight: bold;">
-                <?= $m['im_vorstand'] ? htmlspecialchars($m['vorstands_rolle']) : 'Aktives Mitglied'; ?>
+                <?= $m['im_vorstand'] ? htmlspecialchars($m['vorstands_rolle']) : 'Mitglied'; ?>
+                <?= (isset($m['ist_aktiv']) && $m['ist_aktiv'] == 0) ? ' (Passiv)' : ''; ?>
             </p>
             <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
             <p>Hier stehen die Detailinformationen, Kontakte oder Statistiken.</p>

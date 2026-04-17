@@ -72,6 +72,11 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         if (!empty($m['ist_gruendungsmitglied'])) {
                             echo "<span style='color: #2980b9; font-weight: bold;'><i class='fa-solid fa-certificate'></i> Gründer</span>";
                         }
+                        if (isset($m['ist_aktiv']) && $m['ist_aktiv'] == 0) {
+                            echo "<span style='color: #e74c3c; font-weight: bold;'><i class='fa-solid fa-user-slash'></i> Passiv</span>";
+                        } else {
+                            echo "<span style='color: #27ae60; font-weight: bold;'><i class='fa-solid fa-user-check'></i> Aktiv</span>";
+                        }
                         echo "</div>";
                         echo "</td>";
 
