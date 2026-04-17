@@ -47,39 +47,6 @@ $bestenliste_200 = $stmt200->fetchAll(PDO::FETCH_ASSOC);
     <p>Die ewigen Bestenlisten unseres Vereins in den verschiedenen Disziplinen.</p>
 
     <div class="bestenlisten-grid">
-        <!-- Liste für 120 Wurf -->
-        <div class="content-tile">
-            <h3 class="bestenliste-header">120 Wurf</h3>
-            <ol class="bestenliste">
-                <?php if (count($bestenliste_120) > 0): ?>
-                    <?php foreach ($bestenliste_120 as $index => $e): ?>
-                        <li>
-                            <div class="bestenliste-platz">
-                                <?= $index + 1 ?>.
-                            </div>
-                            <div class="bestenliste-details">
-                                <div class="bestenliste-name-wert">
-                                    <strong>
-                                        <?= htmlspecialchars($e['vorname'] . ' ' . $e['nachname']) ?>
-                                    </strong>
-                                    <span class="bestenliste-wert">
-                                        <?= htmlspecialchars($e['best_120_wert']) ?> Holz
-                                    </span>
-                                </div>
-                                <div class="bestenliste-meta">
-                                    <?= !empty($e['best_120_ort']) ? htmlspecialchars($e['best_120_ort']) : '' ?>
-                                    <?= !empty($e['best_120_datum']) ? ' am ' . date("d.m.Y", strtotime($e['best_120_datum'])) : '' ?>
-                                </div>
-                            </div>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="bestenliste-leer">Noch keine Einträge vorhanden.</p>
-                <?php endif; ?>
-            </ol>
-        </div>
-
-        <!-- Generische Funktion, um Code-Duplikate zu vermeiden -->
         <?php
         function render_bestenliste($titel, $liste, $wert_key, $datum_key, $ort_key)
         {
@@ -91,7 +58,7 @@ $bestenliste_200 = $stmt200->fetchAll(PDO::FETCH_ASSOC);
                 <ol class="bestenliste">
                     <?php if (count($liste) > 0): ?>
                         <?php foreach ($liste as $index => $e): ?>
-                            <li>
+                            <li class="<?= $index >= 3 ? 'hidden-item' : '' ?>" style="<?= $index >= 3 ? 'display: none;' : '' ?>">
                                 <div class="bestenliste-platz">
                                     <?= $index + 1 ?>.
                                 </div>
@@ -115,15 +82,40 @@ $bestenliste_200 = $stmt200->fetchAll(PDO::FETCH_ASSOC);
                         <p class="bestenliste-leer">Noch keine Einträge vorhanden.</p>
                     <?php endif; ?>
                 </ol>
+                <?php if (count($liste) > 3): ?>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleList(this)">Mehr anzeigen</button>
+                    </div>
+                <?php endif; ?>
             </div>
             <?php return ob_get_clean();
         }
 
+        echo render_bestenliste('120 Wurf', $bestenliste_120, 'best_120_wert', 'best_120_datum', 'best_120_ort');
         echo render_bestenliste('100 Wurf', $bestenliste_100, 'best_100_wert', 'best_100_datum', 'best_100_ort');
         echo render_bestenliste('200 Wurf', $bestenliste_200, 'best_200_wert', 'best_200_datum', 'best_200_ort');
         ?>
     </div>
 </main>
+
+<script>
+function toggleList(btn) {
+    const ol = btn.parentElement.previousElementSibling;
+    const hiddenItems = ol.querySelectorAll('.hidden-item');
+    
+    let isShowing = btn.getAttribute('data-showing') === 'true';
+    
+    if (isShowing) {
+        hiddenItems.forEach(item => item.style.display = 'none');
+        btn.innerText = 'Mehr anzeigen';
+        btn.setAttribute('data-showing', 'false');
+    } else {
+        hiddenItems.forEach(item => item.style.display = 'flex');
+        btn.innerText = 'Weniger anzeigen';
+        btn.setAttribute('data-showing', 'true');
+    }
+}
+</script>
 
 <?php
 require_once __DIR__ . '/../../templates/footer.php';

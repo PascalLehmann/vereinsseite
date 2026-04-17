@@ -32,8 +32,10 @@ details.dropdown-menu summary {
     transition: background-color 0.3s;
 }
 
-.nav-links a:hover, 
-details.dropdown-menu summary:hover {
+.nav-links a:hover,
+.nav-links a.active, 
+details.dropdown-menu summary:hover,
+details.dropdown-menu summary.active {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -65,14 +67,19 @@ details.dropdown-menu ul {
 
 /* Handy Ansicht */
 @media (max-width: 768px) {
-    .mobile-menu-btn { display: block; }
+    .mobile-menu-btn { display: block; text-align: center; }
     
     /* Verstecke die Links standardmäßig auf Mobile */
-    .nav-links { display: none; margin-top: 10px; }
+    .nav-links { display: none; margin-top: 10px; text-align: center; }
     
     /* Wenn Checkbox aktiv (Klick auf "MENÜ"), zeige die Links */
     #mobile-menu-toggle:checked ~ .nav-links {
         display: block;
+    }
+
+    /* Zentriert auch die Untermenü-Punkte */
+    details.dropdown-menu ul {
+        margin-left: 0;
     }
 }
 
@@ -738,7 +745,7 @@ details.dropdown-menu ul {
    ========================================= */
 .bestenlisten-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px;
     margin-top: 25px;
 }
@@ -853,3 +860,15 @@ details.dropdown-menu ul {
 
 .admin-image-actions a.btn-delete:hover { background-color: rgba(231, 76, 60, 0.8); } /* rot */
 .admin-image-actions a.btn-restore:hover { background-color: rgba(46, 204, 113, 0.8); } /* grün */
+
+/* =========================================
+   SEITENSPEZIFISCHE MOBILE FIXES
+   ========================================= */
+@media (max-width: 480px) {
+    /* Verhindert auf der Startseite das Überlaufen des Headers,
+       indem Logo und Text untereinander gestapelt werden. */
+    .home-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
