@@ -85,6 +85,9 @@ body {
         
         grid-template-columns: 1fr; 
         grid-template-rows: auto 1fr auto; 
+
+        /* Text auf der ganzen Seite global zentrieren */
+        text-align: center;
     }
 
     nav {
@@ -94,15 +97,24 @@ body {
         padding: 15px;
     }
     
-    /* Zerstöre die Desktop Inverted Radii auf dem Handy */
-    nav::after, footer::before, footer::after {
-        display: none; 
+    /* Inverted Radii für Mobile (Nav unten links/rechts) */
+    nav::before, nav::after {
+        content: "";
+        position: absolute;
+        bottom: calc(var(--radius-size) * -1);
+        width: var(--radius-size);
+        height: var(--radius-size);
+        background-color: var(--sidebar-color);
+        z-index: 1;
+        display: block;
     }
+    nav::before { left: 0; }
+    nav::after { right: 0; top: auto; } /* Überschreibt Desktop top: 0 */
 
 main {
         grid-column: 1 / 2;
         grid-row: 2 / 3;
-        border-radius: 0;
+        border-radius: var(--radius-size);
         padding: 20px;
         
         /* Handy: Interne Scrollbar abschalten, da die ganze Seite scrollt */
@@ -113,5 +125,11 @@ main {
         grid-column: 1 / 2;
         grid-row: 3 / 4;
         border-radius: 0;
+    }
+
+    /* Die Desktop Footer-Radii können wir auf Mobile 1:1 weiterverwenden! 
+       Sie sitzen bereits perfekt oben links und rechts am Footer. */
+    footer::before, footer::after {
+        display: block;
     }
 }

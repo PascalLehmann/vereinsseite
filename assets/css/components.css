@@ -864,11 +864,57 @@ details.dropdown-menu ul {
 /* =========================================
    SEITENSPEZIFISCHE MOBILE FIXES
    ========================================= */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     /* Verhindert auf der Startseite das Überlaufen des Headers,
        indem Logo und Text untereinander gestapelt werden. */
     .home-header {
         flex-direction: column;
         text-align: center;
+    }
+
+    /* Erzwingt eine generelle Zentrierung für alle Inhalte in Kacheln */
+    .content-tile, .dashboard-section h3, .flip-card-back-stats {
+        text-align: center !important;
+    }
+
+    /* Flex- und Grid-Container (Dashboard, Galerien, Buttons) zentrieren */
+    main div[style*="flex-wrap: wrap"],
+    .dashboard-grid,
+    .news-gallery,
+    .news-gallery-admin,
+    [class*="galerie"],
+    [class*="kategorie"] {
+        justify-content: center !important;
+    }
+
+    /* Flip-Card Rückseiten komplett zentrieren */
+    .flip-card-back-stats div[style*="display: flex"] {
+        justify-content: center !important;
+        gap: 10px;
+    }
+
+    /* Bestenliste komplett mittig darstellen */
+    .bestenliste li {
+        flex-direction: column;
+        align-items: center;
+    }
+    .bestenliste-platz {
+        margin-bottom: 5px;
+    }
+    .bestenliste-name-wert {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Tabellen & Formulare in der Admin-Übersicht */
+    .admin-table th, .admin-table td {
+        text-align: center;
+    }
+    .action-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
     }
 }
