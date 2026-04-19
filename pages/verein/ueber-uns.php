@@ -27,7 +27,7 @@ require_once __DIR__ . '/../../templates/navigation.php';
             <p><strong>SKV Nüünerkiller 16 Eisingen e.V.</strong></p>
             <p>Talstraße 29-33<br>75239 Eisingen</p>
             <p style="margin-top: 15px;">
-                <strong>Telefon:</strong> 0123 / 4567890<br>
+                <strong>Telefon:</strong> 0172 / 4032173<br>
                 <strong>E-Mail:</strong> <a href="mailto:info@skv9killer.de"
                     style="color: var(--sidebar-color); text-decoration: none;">info@skv9killer.de</a>
             </p>
