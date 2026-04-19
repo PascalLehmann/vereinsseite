@@ -28,6 +28,9 @@ $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 // password_verify() macht die ganze Kryptographie-Arbeit (Salt & Hash abgleichen)
 if ($user && password_verify($password, $user['password_hash'])) {
 
+    // Sicherheit: Session-ID nach erfolgreichem Login erneuern (Schutz vor Session Fixation)
+    session_regenerate_id(true);
+
     // --- SCHRITT B: Rollen des Users laden ---
 
     $roles = [];

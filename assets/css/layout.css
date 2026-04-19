@@ -3,7 +3,10 @@
    ========================================= */
 body {
     display: grid;
-    grid-template-columns: 250px 1fr; 
+    /* Das Menü ist 200px breit. Die Hauptspalte darf max 1300px breit werden 
+       (1200px für die Panels + 2x 50px Seitenabstand). Dadurch "klebt" das Menü an den Panels! */
+    grid-template-columns: 200px minmax(auto, 1300px); 
+    justify-content: center; /* Zentriert die gesamte Webseite auf großen Bildschirmen */
     grid-template-rows: 1fr auto; 
     
     /* ÄNDERUNG 1: Feste Höhe erzwingen statt min-height */
@@ -36,7 +39,7 @@ main {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
     background-color: var(--content-bg);
-    padding: 40px;
+    padding: 40px 50px; /* Erzwingt exakt 50px Abstand zwischen Menü und Panel (sowie zum rechten Rand) */
     position: relative;
     z-index: 2;
     border-radius: var(--radius-size);

@@ -11,20 +11,16 @@
         <?php endif; ?>
     </p>
 </footer>
-<script src="/assets/js/script.js"></script>
-<script>
-    function openLightbox(src) {
-        const overlay = document.getElementById('lightbox-overlay');
-        const img = document.getElementById('lightbox-img');
-        img.src = src;
-        overlay.classList.add('active');
-    }
 
-    function closeLightbox() {
-        const overlay = document.getElementById('lightbox-overlay');
-        overlay.classList.remove('active');
-    }
-</script>
+<!-- Globale Lightbox (wird von script.js gesteuert) -->
+<div id="imageLightbox" class="news-lightbox-modal">
+    <span class="news-lightbox-close">&times;</span>
+    <div class="news-lightbox-content">
+        <img class="news-lightbox-image" id="lightboxImage" alt="Vergrößerte Ansicht">
+    </div>
+</div>
+
+<script src="/assets/js/script.js"></script>
 </body>
 
 </html>

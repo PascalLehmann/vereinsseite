@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../login.php");
+    exit;
+}
+
 $perms = $_SESSION['permissions'] ?? [];
 if (empty($perms['news_delete_hard'])) {
     die("Zugriff verweigert: Du benötigst das Recht, News endgültig zu löschen.");

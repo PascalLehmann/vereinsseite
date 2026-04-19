@@ -16,11 +16,8 @@ require_once __DIR__ . '/../../templates/navigation.php';
 
 <main class="content">
     <h1>Über den Verein</h1>
-    <p>Erfahre mehr über unsere Geschichte, Trainingszeiten und wo du uns findest.</p>
 
-    <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
-
+    <div class="ueber-uns-grid" style="margin-top: 30px; margin-bottom: 30px;">
         <!-- Karte: Adresse & Kontakt -->
         <div class="content-tile">
             <h3
@@ -44,27 +41,27 @@ require_once __DIR__ . '/../../templates/navigation.php';
             </h3>
             <p>Komm gerne vorbei und schau dir unser Training an. Neue Gesichter sind immer willkommen!</p>
             <ul style="list-style: none; padding: 0; margin-top: 15px;">
-                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Donnerstag:</strong> 15:00 - 19:00
+                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Donnerstag:</strong> 15:00 -
+                    19:00
                     Uhr
                 </li>
             </ul>
         </div>
-
-        <!-- Karte: Gründung & Historie -->
-        <div class="content-tile" style="grid-column: 1 / -1;">
-            <h3
-                style="color: var(--sidebar-color); border-bottom: 2px solid var(--sidebar-color); padding-bottom: 5px; margin-bottom: 15px;">
-                <i class="fa-solid fa-book-open"></i> Vereinsgeschichte
-            </h3>
-            <p>Der <strong>SKV Nüünerkiller 16 Eisingen e.V.</strong> wurde im Jahr <strong>2016</strong> von einer
-                Gruppe
-                leidenschaftlicher Kegler ins Leben gerufen.</p>
-            <p style="margin-top: 10px; line-height: 1.6;">Seitdem haben wir uns nicht nur sportlich weiterentwickelt,
-                sondern auch eine starke Gemeinschaft aufgebaut. Unser Fokus liegt auf sportlichem Ehrgeiz, Teamgeist
-                und natürlich dem geselligen Beisammensein nach den Spieltagen. Wir blicken stolz auf
-                10 Jahre Vereinsgeschichte zurück und freuen uns auf viele weitere erfolgreiche Jahre auf der
-                Kegelbahn.</p>
-        </div>
+    </div>
+    <!-- Karte: Gründung & Historie -->
+    <div class="content-tile">
+        <h3
+            style="color: var(--sidebar-color); border-bottom: 2px solid var(--sidebar-color); padding-bottom: 5px; margin-bottom: 15px;">
+            <i class="fa-solid fa-book-open"></i> Vereinsgeschichte
+        </h3>
+        <p>Der <strong>SKV Nüünerkiller 16 Eisingen e.V.</strong> wurde im Jahr <strong>2016</strong> von einer
+            Gruppe
+            leidenschaftlicher Kegler ins Leben gerufen.</p>
+        <p style="margin-top: 10px; line-height: 1.6;">Seitdem haben wir uns nicht nur sportlich weiterentwickelt,
+            sondern auch eine starke Gemeinschaft aufgebaut. Unser Fokus liegt auf sportlichem Ehrgeiz, Teamgeist
+            und natürlich dem geselligen Beisammensein nach den Spieltagen. Wir blicken stolz auf
+            10 Jahre Vereinsgeschichte zurück und freuen uns auf viele weitere erfolgreiche Jahre auf der
+            Kegelbahn.</p>
     </div>
 </main>
 

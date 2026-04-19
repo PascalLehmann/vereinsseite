@@ -28,6 +28,10 @@ if (!$m) {
     exit;
 }
 
+// Dynamische Vorstands-Positionen aus der Datenbank laden
+$stmtPos = $pdo->query("SELECT name FROM vorstand_positionen ORDER BY name ASC");
+$vorstands_positionen = $stmtPos->fetchAll(PDO::FETCH_COLUMN);
+
 $pageTitle = "Mitglied bearbeiten";
 require_once __DIR__ . '/../../../templates/header.php';
 require_once __DIR__ . '/../../../templates/navigation.php';
@@ -87,9 +91,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <select name="vorstands_rolle" class="form-control" <?= !$canEditAll ? 'disabled' : '' ?>>
                     <option value="">-- Bitte wählen --</option>
                     <?php
-                    $rollen = ["1. Vorsitzender", "2. Vorsitzender", "Sportwart", "Kassenwart", "Schriftführer", "Jugendwart"];
-                    foreach ($rollen as $rolle): ?>
-                        <option value="<?= $rolle ?>" <?= ($m['vorstands_rolle'] == $rolle) ? 'selected' : '' ?>><?= $rolle ?>
+                    foreach ($vorstands_positionen as $rolle): ?>
+                        <option value="<?= htmlspecialchars($rolle) ?>" <?= ($m['vorstands_rolle'] == $rolle) ? 'selected' : '' ?>><?= htmlspecialchars($rolle) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

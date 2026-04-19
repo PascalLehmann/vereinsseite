@@ -7,13 +7,29 @@ $pageTitle = "Termine & Spieltage";
 require_once __DIR__ . '/../../templates/header.php';
 require_once __DIR__ . '/../../templates/navigation.php';
 
-// SQL-Abfrage: Wir verknüpfen den Termin mit dem Gegner
+// --- PAGINIERUNG SETUP ---
+$limit = 10; // Maximal 10 Termine pro Seite
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1)
+    $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Gesamtzahl der aktiven Termine ermitteln
+$stmtCount = $pdo->query("SELECT COUNT(*) FROM termine WHERE is_deleted = 0");
+$total_termine = $stmtCount->fetchColumn();
+$total_pages = ceil($total_termine / $limit);
+
+// SQL-Abfrage mit Limit
 $sql = "SELECT t.*, g.name AS gegner_name, g.strasse, g.plz, g.ort AS gegner_ort, g.bahnen 
         FROM termine t 
         LEFT JOIN gegner g ON t.gegner_id = g.id 
         WHERE t.is_deleted = 0
-        ORDER BY t.termin_datum ASC";
-$stmt = $pdo->query($sql);
+        ORDER BY t.termin_datum ASC
+        LIMIT :limit OFFSET :offset";
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $termine = $stmt->fetchAll();
 
 // Hilfsfunktion um Spielernamen/Bild zu holen
@@ -177,6 +193,34 @@ function getSpielerInfo($id, $pdo)
 
             </article>
         <?php endforeach; ?>
+        
+        <?php
+        // --- PAGINIERUNG LINKS ANZEIGEN ---
+        if (isset($total_pages) && $total_pages > 1) {
+            echo "<div class='pagination' style='text-align: center; margin-top: 30px; margin-bottom: 20px;'>";
+
+            // Zurück-Button
+            if ($page > 1) {
+                echo "<a href='?page=" . ($page - 1) . "' class='btn btn-secondary' style='margin: 0 5px;'>&laquo; Zurück</a>";
+            }
+
+            // Seitenzahlen generieren
+            for ($i = 1; $i <= $total_pages; $i++) {
+                if ($i == $page) {
+                    echo "<span class='btn btn-primary' style='margin: 0 5px; cursor: default;'>$i</span>";
+                } else {
+                    echo "<a href='?page=$i' class='btn btn-secondary' style='margin: 0 5px;'>$i</a>";
+                }
+            }
+
+            // Weiter-Button
+            if ($page < $total_pages) {
+                echo "<a href='?page=" . ($page + 1) . "' class='btn btn-secondary' style='margin: 0 5px;'>Weiter &raquo;</a>";
+            }
+
+            echo "</div>";
+        }
+        ?>
     </div>
 </main>
 

@@ -63,7 +63,7 @@ require_once __DIR__ . '/../../templates/navigation.php';
 
                 echo "<div class='news-gallery'>";
                 foreach ($bilder as $pfad) {
-                    echo "<img src='" . htmlspecialchars($pfad) . "' alt='Bild zur News' class='news-thumbnail'>";
+                    echo "<img src='" . htmlspecialchars($pfad) . "' alt='Bild zur News' class='news-thumbnail' loading='lazy'>";
                 }
                 echo "</div>";
             }
@@ -78,13 +78,6 @@ require_once __DIR__ . '/../../templates/navigation.php';
         echo "<div class='content-tile alert-error'>Fehler beim Laden der News: " . $e->getMessage() . "</div>";
     }
     ?>
-
-    <div id="imageLightbox" class="news-lightbox-modal">
-        <span class="news-lightbox-close">&times;</span>
-        <div class="news-lightbox-content">
-            <img class="news-lightbox-image" id="lightboxImage" alt="Vergrößerte Ansicht">
-        </div>
-    </div>
 
 </main>
 

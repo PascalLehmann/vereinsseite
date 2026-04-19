@@ -44,7 +44,6 @@ $bestenliste_200 = $stmt200->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="content">
     <h1>Vereinsbestenliste</h1>
-    <p>Die ewigen Bestenlisten unseres Vereins in den verschiedenen Disziplinen.</p>
 
     <div class="bestenlisten-grid">
         <?php
@@ -99,22 +98,22 @@ $bestenliste_200 = $stmt200->fetchAll(PDO::FETCH_ASSOC);
 </main>
 
 <script>
-function toggleList(btn) {
-    const ol = btn.parentElement.previousElementSibling;
-    const hiddenItems = ol.querySelectorAll('.hidden-item');
-    
-    let isShowing = btn.getAttribute('data-showing') === 'true';
-    
-    if (isShowing) {
-        hiddenItems.forEach(item => item.style.display = 'none');
-        btn.innerText = 'Mehr anzeigen';
-        btn.setAttribute('data-showing', 'false');
-    } else {
-        hiddenItems.forEach(item => item.style.display = 'flex');
-        btn.innerText = 'Weniger anzeigen';
-        btn.setAttribute('data-showing', 'true');
+    function toggleList(btn) {
+        const ol = btn.parentElement.previousElementSibling;
+        const hiddenItems = ol.querySelectorAll('.hidden-item');
+
+        let isShowing = btn.getAttribute('data-showing') === 'true';
+
+        if (isShowing) {
+            hiddenItems.forEach(item => item.style.display = 'none');
+            btn.innerText = 'Mehr anzeigen';
+            btn.setAttribute('data-showing', 'false');
+        } else {
+            hiddenItems.forEach(item => item.style.display = 'flex');
+            btn.innerText = 'Weniger anzeigen';
+            btn.setAttribute('data-showing', 'true');
+        }
     }
-}
 </script>
 
 <?php

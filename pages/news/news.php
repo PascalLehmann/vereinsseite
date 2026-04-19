@@ -18,13 +18,29 @@ require_once __DIR__ . '/../../templates/navigation.php';
     <div class="news-list">
         <?php
         try {
-            // News abfragen (neueste zuerst)
+            // --- PAGINIERUNG SETUP ---
+            $limit = 5; // Maximal 5 News pro Seite
+            $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+            if ($page < 1)
+                $page = 1;
+            $offset = ($page - 1) * $limit;
+
+            // Gesamtzahl der aktiven News ermitteln
+            $stmtCount = $pdo->query("SELECT COUNT(*) FROM news WHERE is_deleted = 0");
+            $total_news = $stmtCount->fetchColumn();
+            $total_pages = ceil($total_news / $limit);
+
+            // News abfragen (neueste zuerst, mit Limit)
             $sql = "SELECT n.id, n.titel, n.inhalt, n.erstellt_am, u.username as autor_name 
                     FROM news n 
                     LEFT JOIN users u ON n.autor_id = u.id 
                     WHERE n.is_deleted = 0 
-                    ORDER BY n.erstellt_am DESC";
-            $stmt = $pdo->query($sql);
+                    ORDER BY n.erstellt_am DESC 
+                    LIMIT :limit OFFSET :offset";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
             $news_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Prepared Statement für das Thumbnail (LIMIT 1 für optimale Performance)
@@ -45,7 +61,7 @@ require_once __DIR__ . '/../../templates/navigation.php';
                     echo "<div class='news-thumb'>";
                     if ($erstes_bild) {
                         // Wenn ein Bild existiert
-                        echo "<img src='" . htmlspecialchars($erstes_bild) . "' alt='News Thumbnail'>";
+                        echo "<img src='" . htmlspecialchars($erstes_bild) . "' alt='News Thumbnail' loading='lazy'>";
                     } else {
                         // Fallback: FontAwesome Icon, wenn kein Bild hochgeladen wurde
                         echo "<i class='fas fa-newspaper'></i>";
@@ -77,6 +93,32 @@ require_once __DIR__ . '/../../templates/navigation.php';
                 }
             } else {
                 echo "<div class='content-tile'><p>Bisher gibt es noch keine Neuigkeiten.</p></div>";
+            }
+
+            // --- PAGINIERUNG LINKS ANZEIGEN ---
+            if (isset($total_pages) && $total_pages > 1) {
+                echo "<div class='pagination' style='text-align: center; margin-top: 30px; margin-bottom: 20px;'>";
+
+                // Zurück-Button
+                if ($page > 1) {
+                    echo "<a href='?page=" . ($page - 1) . "' class='btn btn-secondary' style='margin: 0 5px;'>&laquo; Zurück</a>";
+                }
+
+                // Seitenzahlen generieren
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    if ($i == $page) {
+                        echo "<span class='btn btn-primary' style='margin: 0 5px; cursor: default;'>$i</span>";
+                    } else {
+                        echo "<a href='?page=$i' class='btn btn-secondary' style='margin: 0 5px;'>$i</a>";
+                    }
+                }
+
+                // Weiter-Button
+                if ($page < $total_pages) {
+                    echo "<a href='?page=" . ($page + 1) . "' class='btn btn-secondary' style='margin: 0 5px;'>Weiter &raquo;</a>";
+                }
+
+                echo "</div>";
             }
 
         } catch (PDOException $e) {

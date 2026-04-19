@@ -14,21 +14,36 @@ if (empty($perms['admin']) && empty($perms['mitglieder_create'])) {
 }
 
 require_once __DIR__ . '/../../../db.php';
+require_once __DIR__ . '/../image_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bildname = null;
 
     // Sicheres Hochladen eines neuen Bildes
     if (isset($_FILES['profilbild']) && $_FILES['profilbild']['error'] === UPLOAD_ERR_OK) {
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime_type = $finfo->file($_FILES['profilbild']['tmp_name']);
+        $erlaubte_formate = ['image/jpeg', 'image/png', 'image/webp'];
+
+        $dateiendung = strtolower(pathinfo($_FILES['profilbild']['name'], PATHINFO_EXTENSION));
+        $erlaubte_endungen = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (!in_array($mime_type, $erlaubte_formate) || !in_array($dateiendung, $erlaubte_endungen)) {
+            die("Sicherheitswarnung: Ungültiges Dateiformat oder Dateiendung.");
+        }
+
         $upload_dir = __DIR__ . '/../../../assets/img/mitglieder/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
         }
 
-        $dateiendung = pathinfo($_FILES['profilbild']['name'], PATHINFO_EXTENSION);
         // Neuen, sicheren Dateinamen generieren
         $bildname = uniqid() . '_' . bin2hex(random_bytes(4)) . '.' . $dateiendung;
-        move_uploaded_file($_FILES['profilbild']['tmp_name'], $upload_dir . $bildname);
+        $ziel_pfad = $upload_dir . $bildname;
+        if (!resizeAndCompressImage($_FILES['profilbild']['tmp_name'], $ziel_pfad, 1920, 80)) {
+            move_uploaded_file($_FILES['profilbild']['tmp_name'], $ziel_pfad);
+        }
     }
 
     $sql = "INSERT INTO mitglieder (
@@ -47,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         empty($_POST['email']) ? null : $_POST['email'],
         empty($_POST['telefon']) ? null : $_POST['telefon'],
         isset($_POST['im_vorstand']) ? 1 : 0,
-        empty($_POST['vorstands_rolle']) ? null : $_POST['vorstands_rolle'],
+        (isset($_POST['im_vorstand']) && !empty($_POST['vorstands_rolle'])) ? $_POST['vorstands_rolle'] : null,
         isset($_POST['ist_gruendungsmitglied']) ? 1 : 0,
         isset($_POST['ist_aktiv']) ? (int) $_POST['ist_aktiv'] : 1,
         empty($_POST['best_100_wert']) ? null : $_POST['best_100_wert'],

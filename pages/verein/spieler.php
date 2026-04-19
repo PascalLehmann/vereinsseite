@@ -47,7 +47,7 @@ $mitglieder = $pdo->query("SELECT * FROM mitglieder ORDER BY nachname ASC")->fet
                         </div>
 
                         <div class="flip-card-text">
-                            <h3><?= htmlspecialchars($m['vorname'] . " " . $m['nachname']) ?></h3>
+                            <h3><?= htmlspecialchars($m['vorname']) ?><br><?= htmlspecialchars($m['nachname']) ?></h3>
                             <p><?= $m['im_vorstand'] ? htmlspecialchars($m['vorstands_rolle']) : 'Aktives Mitglied' ?></p>
                             <span class="flip-card-hover-badge">Stats drehen</span>
                         </div>

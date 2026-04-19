@@ -19,16 +19,21 @@ $canGalerie = !empty($perms['galerie_upload']) || !empty($perms['galerie_delete'
 $canGalerieKat = !empty($perms['galerie_kat_create']) || !empty($perms['galerie_kat_delete']) || !empty($perms['galerie_kat_delete_hard']);
 $isAdmin = !empty($perms['admin']);
 
+// Berechtigung für die Gegner-Analyse (Admins und Autoren)
+$canGegnerAnalyse = in_array('admin', $roles) || in_array('autor', $roles);
+
 // Header einbinden (absoluter Pfad auf dem Server)
 require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/navigation.php';
 ?>
 
 <main class="dashboard-container">
     <h2>Willkommen im Admin-Bereich, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
 
-    <p>Deine aktuellen Rechte: <strong><?php echo htmlspecialchars(implode(', ', $roles)); ?></strong></p>
-
-    <hr>
+    <div class="content-tile" style="text-align: center; margin-bottom: 40px; padding: 15px;">
+        <p style="margin: 0;">Deine aktuellen Rechte: <strong
+                style="color: var(--sidebar-color);"><?php echo htmlspecialchars(implode(', ', $roles)); ?></strong></p>
+    </div>
 
     <?php
     // --- CONTENT BEREICH ---
@@ -56,6 +61,21 @@ require_once __DIR__ . '/../../templates/header.php';
                         <span>Galerie verwalten</span>
                     </a>
                 <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php
+    // --- STATISTIK BEREICH ---
+    if ($canGegnerAnalyse):
+        ?>
+        <div class="dashboard-section">
+            <h3>Statistik</h3>
+            <div class="dashboard-grid">
+                <a href="gegner/import_sportwinner.php" class="dashboard-tile" style="border-color: #3498db;">
+                    <i class="fas fa-chart-bar" style="color: #3498db;"></i>
+                    <span>Gegner-Analyse</span>
+                </a>
             </div>
         </div>
     <?php endif; ?>
@@ -107,6 +127,10 @@ require_once __DIR__ . '/../../templates/header.php';
     <div class="dashboard-section">
         <h3>Konto</h3>
         <div class="dashboard-grid">
+            <a href="benutzer/passwort_aendern.php" class="dashboard-tile">
+                <i class="fas fa-key"></i>
+                <span>Passwort ändern</span>
+            </a>
             <a href="logout.php" class="dashboard-tile logout-tile">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Ausloggen</span>

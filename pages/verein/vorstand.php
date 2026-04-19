@@ -26,7 +26,6 @@ $vorstand_mitglieder = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="content">
     <h1>Unser Vorstand</h1>
-    <p>Die gewählten Vertreter unseres Vereins.</p>
 
     <div class="vorstand-grid">
         <?php if (count($vorstand_mitglieder) > 0): ?>
@@ -42,7 +41,8 @@ $vorstand_mitglieder = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                                 style="background-image: url('<?= !empty($m['profilbild']) ? '/assets/img/mitglieder/' . htmlspecialchars($m['profilbild']) : '/assets/img/mitglieder/default-user.png' ?>');">
                             </div>
                             <div class="flip-card-text">
-                                <h3><?= htmlspecialchars($m['vorname'] . ' ' . $m['nachname']) ?></h3>
+                                <h3><?= htmlspecialchars($m['vorname']) ?><br><?= htmlspecialchars($m['nachname']) ?></h3>
+
                                 <p><?= htmlspecialchars($m['vorstands_rolle']) ?></p>
                                 <span class="flip-card-hover-badge">Infos drehen</span>
                             </div>

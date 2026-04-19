@@ -39,19 +39,12 @@ require_once __DIR__ . '/../../templates/navigation.php';
 
         if (count($bilder) > 0) {
             foreach ($bilder as $row) {
-                echo "<img src='" . htmlspecialchars($row['bild_pfad']) . "' class='news-thumbnail' alt='Galerie Bild'>";
+                echo "<img src='" . htmlspecialchars($row['bild_pfad']) . "' class='news-thumbnail' alt='Galerie Bild' loading='lazy'>";
             }
         } else {
             echo "<p>Aktuell sind noch keine Bilder in dieser Kategorie vorhanden.</p>";
         }
         ?>
-    </div>
-
-    <div id="imageLightbox" class="news-lightbox-modal">
-        <span class="news-lightbox-close">&times;</span>
-        <div class="news-lightbox-content">
-            <img class="news-lightbox-image" id="lightboxImage" alt="Vergrößerte Ansicht">
-        </div>
     </div>
 
 </main>

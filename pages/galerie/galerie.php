@@ -13,7 +13,6 @@ require_once __DIR__ . '/../../templates/navigation.php';
 
 <main>
     <h2>Bildergalerie</h2>
-    <p style="margin-bottom: 25px; color: #666;">Einige Eindrücke aus unserem Vereinsleben und den Spieltagen.</p>
 
     <div class="content-tile">
         <div class="news-gallery">

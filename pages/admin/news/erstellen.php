@@ -16,6 +16,7 @@ if (!$canNewsCreate) {
 
 // 2. DATENBANK EINBINDEN
 require_once __DIR__ . '/../../../db.php';
+require_once __DIR__ . '/../image_helper.php';
 
 $error = '';
 $success = '';
@@ -83,8 +84,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             throw new Exception("Falsches Dateiformat. Nur JPG, PNG und WEBP sind erlaubt.");
                         }
 
-                        // 3. Sicheren Dateinamen generieren (z.B. 64b3a12..._bild.jpg)
-                        $dateiendung = pathinfo($_FILES['bilder']['name'][$i], PATHINFO_EXTENSION);
+                        // 3. Dateiendung prüfen & sicheren Namen generieren
+                        $dateiendung = strtolower(pathinfo($_FILES['bilder']['name'][$i], PATHINFO_EXTENSION));
+                        $erlaubte_endungen = ['jpg', 'jpeg', 'png', 'webp'];
+                        if (!in_array($dateiendung, $erlaubte_endungen)) {
+                            throw new Exception("Die Dateiendung ist nicht erlaubt.");
+                        }
+
                         $neuer_dateiname = uniqid() . '_' . bin2hex(random_bytes(4)) . '.' . $dateiendung;
                         $ziel_pfad_absolut = $upload_dir . $neuer_dateiname;
 
@@ -92,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $ziel_pfad_db = '/uploads/news/' . $neuer_dateiname;
 
                         // 4. Datei aus dem RAM/Temp in den finalen Ordner verschieben
-                        if (move_uploaded_file($tmp_name, $ziel_pfad_absolut)) {
+                        if (resizeAndCompressImage($tmp_name, $ziel_pfad_absolut, 1920, 80) || move_uploaded_file($tmp_name, $ziel_pfad_absolut)) {
                             // Pfad in die Datenbank schreiben
                             $stmtBild->execute([
                                 ':news_id' => $news_id,

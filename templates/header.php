@@ -30,5 +30,3 @@
 </head>
 
 <body>
-
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/templates/navigation.php'; ?>

@@ -1,10 +1,21 @@
 /* =========================================
    TYPOGRAFIE & GLOBALE ABSTÄNDE
    ========================================= */
-main h2 {
-    margin-bottom: 25px; /* Erzwingt IMMER 25px Abstand unter der Überschrift */
-    /* Optional: Falls dir das Standard-Schwarz zu langweilig ist, 
-       kannst du hier auch color: var(--sidebar-color); nutzen! */
+main > h1, 
+main > h2 {
+    text-align: center; /* Überschriften zentrieren */
+    
+    /* NEU: 3D-Box Styling für die Hauptüberschriften */
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 1200px; /* Passt zur maximalen Breite der anderen Kacheln */
+    margin: 0 auto 25px auto; 
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 15px 25px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Wir lagern auch die Abstände für die Button-Container aus */
@@ -23,6 +34,7 @@ main h2 {
 .nav-links a, 
 details.dropdown-menu summary {
     text-decoration: none;
+    font-size: 1.1em; /* HIER DIE SCHRIFTGRÖSSE EINSTELLEN (z.B. 18px oder 1.2rem) */
     color: var(--sidebar-text-color);
     display: block;
     padding: 12px 15px;
@@ -222,7 +234,11 @@ details.dropdown-menu ul {
     background-color: #ffffff;
     border-radius: 15px;
     padding: 20px;
-    margin-bottom: 25px;
+    
+    /* NEU: Maximale Breite und automatische Zentrierung */
+    max-width: 1200px; /* HIER KANNST DU DIE MAXIMALE BREITE FÜR ALLE PANELS ÄNDERN (z.B. 1000px oder 1400px) */
+    margin: 0 auto 25px auto; 
+    /* min-height: 300px; HIER KANNST DU EINE MINDESTHÖHE FÜR DIE WEISSEN PANELS ERZWINGEN */
     
     /* Der 3D Effekt: Mehrere softe Schatten für echte Tiefe */
     box-shadow: 
@@ -519,7 +535,7 @@ details.dropdown-menu ul {
     display: grid;
     /* auto-fill und feste Breite (z.B. 320px) = Boxen strecken sich nicht mehr, 
        sondern reihen sich auf und brechen sauber in die nächste Zeile um. */
-    grid-template-columns: repeat(auto-fill, 320px);
+    grid-template-columns: repeat(auto-fill, 300px); /* HIER DIE RASTER-BREITE ANPASSEN (z.B. auf 280px) */
     justify-content: center; /* Zentriert die aufgereihten Boxen in der Mitte */
     gap: 30px;
     margin-top: 30px;
@@ -529,8 +545,9 @@ details.dropdown-menu ul {
    3D FLIP CARDS (Vorstand & Spieler)
    ========================================= */
 .flip-card-outer {
-    height: 400px;
-    width: 300px;
+    height: 375px; /* HIER DIE HÖHE DER KARTEN ÄNDERN (z.B. auf 350px oder 450px) */
+    max-height: 500px; /* HIER KANNST DU EINE MAXIMALE HÖHE FESTLEGEN (z.B. 500px) */
+    width: 300px;  /* HIER DIE BREITE DER KARTEN ÄNDERN (z.B. auf 250px) */
     margin: 0 auto;
     perspective: 900px;
     perspective-origin: 50% calc(50% - 18em);
@@ -608,10 +625,11 @@ details.dropdown-menu ul {
 
 .flip-card-text h3 {
     font-weight: 700;
-    text-transform: uppercase;
+    text-transform: none; /* Namen exakt so anzeigen, wie in der Datenbank eingetragen */
     font-size: 20px;
     margin-bottom: 5px;
     color: #333;
+    line-height: 1.2; /* Sorgt für einen sauberen Abstand beim Zeilenumbruch */
 }
 
 .flip-card-text p {
@@ -681,7 +699,17 @@ details.dropdown-menu ul {
    ADMIN DASHBOARD KACHELN
    ========================================= */
 .dashboard-section {
-    margin-bottom: 40px;
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    
+    /* NEU: 3D Panel Styling für die Haupt-Sektionen */
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 15px 25px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-section h3 {
@@ -699,7 +727,7 @@ details.dropdown-menu ul {
 }
 
 .dashboard-tile {
-    background-color: #ffffff;
+    background-color: #f8f9fa; /* Leichtes Grau, damit sich die Tasten vom weißen Panel abheben */
     border-radius: 12px;
     padding: 30px 20px;
     text-align: center;
@@ -750,6 +778,13 @@ details.dropdown-menu ul {
     margin-top: 25px;
 }
 
+/* Überschreibt die automatische Zentrierung, damit die Listen im Grid alle exakt gleich breit gezogen werden */
+.bestenlisten-grid .content-tile {
+    margin: 0;
+    width: 100%;
+    height: 100%; /* Zieht die Boxen optional auch noch auf die gleiche Höhe */
+}
+
 .bestenliste-header {
     color: var(--sidebar-color);
     border-bottom: 2px solid var(--sidebar-color);
@@ -788,6 +823,21 @@ details.dropdown-menu ul {
 .bestenliste-wert { font-weight: bold; background-color: #f3f4f6; padding: 3px 8px; border-radius: 5px; font-size: 0.9rem; }
 .bestenliste-meta { font-size: 0.8rem; color: #777; }
 .bestenliste-leer { color: #666; margin-top: 20px; }
+
+/* =========================================
+   ÜBER UNS (Kontakt & Training)
+   ========================================= */
+.ueber-uns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.ueber-uns-grid .content-tile {
+    margin: 0; /* Überschreibt die automatische globale Zentrierung */
+    height: 100%; /* Zieht beide Boxen auf die exakt gleiche Höhe */
+    width: 100%;
+}
 
 /* =========================================
    UNAUFFÄLLIGER LOGIN-LINK (FOOTER)

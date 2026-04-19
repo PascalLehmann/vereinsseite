@@ -13,6 +13,11 @@ if (empty($perms['admin']) && empty($perms['mitglieder_create'])) {
     die("Zugriff verweigert.");
 }
 
+// Datenbank einbinden und dynamische Vorstands-Positionen laden
+require_once __DIR__ . '/../../../db.php';
+$stmtPos = $pdo->query("SELECT name FROM vorstand_positionen ORDER BY name ASC");
+$vorstands_positionen = $stmtPos->fetchAll(PDO::FETCH_COLUMN);
+
 $pageTitle = "Mitglied hinzufügen";
 
 // 2. LAYOUT EINBINDEN
@@ -28,7 +33,7 @@ require_once __DIR__ . '/../../../templates/navigation.php';
     </div>
 
     <form action="speichern.php" method="POST" enctype="multipart/form-data" class="content-tile"
-        style="max-width: 800px;">
+        style="max-width: 1000px;"> <!-- HIER DIE GRÖSSE DIESES SPEZIELLEN PANELS ÄNDERN -->
 
         <div style="display: flex; gap: 15px;">
             <div class="form-group" style="flex: 1;">
@@ -67,9 +72,8 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 <select name="vorstands_rolle" class="form-control">
                     <option value="">-- Bitte wählen --</option>
                     <?php
-                    $rollen = ["1. Vorsitzender", "2. Vorsitzender", "Sportwart", "Kassenwart", "Schriftführer", "Jugendwart"];
-                    foreach ($rollen as $rolle): ?>
-                        <option value="<?= $rolle ?>"><?= $rolle ?></option>
+                    foreach ($vorstands_positionen as $rolle): ?>
+                        <option value="<?= htmlspecialchars($rolle) ?>"><?= htmlspecialchars($rolle) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
