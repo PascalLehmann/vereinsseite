@@ -1,5 +1,38 @@
 <?php
 session_start();
+
+// --- GEMEINSAME SPORTWINNER API FUNKTION ---
+if (!function_exists('fetchSportwinnerAPI')) {
+    function fetchSportwinnerAPI($params)
+    {
+        $apiUrl = 'https://blbk.sportwinner.de/php/blbk/service.php';
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n" .
+                    "Accept: application/json, text/javascript, */*; q=0.01\r\n" .
+                    "X-Requested-With: XMLHttpRequest\r\n" .
+                    "Referer: https://blbk.sportwinner.de/\r\n" .
+                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n",
+                'content' => http_build_query($params)
+            ],
+            'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+        ];
+        $context = stream_context_create($options);
+        $json = @file_get_contents($apiUrl, false, $context);
+        return $json ? json_decode($json, true) : [];
+    }
+}
+
+// --- PROXY FÜR AJAX LIGEN-ABRUF (MUSS GANZ OBEN STEHEN) ---
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'get_ligen') {
+    require_once __DIR__ . '/../../../db.php';
+    $saison_id = $_GET['saison_id'] ?? '';
+    header('Content-Type: application/json');
+    echo json_encode(fetchSportwinnerAPI(['command' => 'GetLigaArray', 'id_saison' => $saison_id, 'id_bezirk' => 0, 'art' => 1, 'favorit' => '']));
+    exit;
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -66,6 +99,46 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                 class="form-control"><?= htmlspecialchars($news['inhalt']) ?></textarea>
         </div>
 
+        <!-- NEU: SPORTWINNER SPIELTAG KOPPLUNG -->
+        <div class="form-group">
+            <label
+                style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; padding: 10px; background: #eef2f5; border-radius: 5px;">
+                <input type="checkbox" id="is_spielbericht" name="is_spielbericht" value="1"
+                    onchange="toggleSpielberichtFields()" style="width: 20px; height: 20px;"
+                    <?= !empty($news['is_spielbericht']) ? 'checked' : '' ?>>
+                News ist ein Spielbericht (Ergebnisse von Sportwinner laden)
+            </label>
+        </div>
+
+        <div id="spielbericht_fields"
+            style="display: <?= !empty($news['is_spielbericht']) ? 'block' : 'none' ?>; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #ccc;">
+            <div class="form-group">
+                <label for="sw_saison_id">Saison:</label>
+                <select id="sw_saison_id" name="sw_saison_id" class="form-control" onchange="loadLigen()">
+                    <?php
+                    $saisons = fetchSportwinnerAPI(['command' => 'GetSaisonArray']);
+                    if (is_array($saisons)) {
+                        foreach ($saisons as $s) {
+                            $selected = ($news['sw_saison_id'] == $s[0]) ? 'selected' : '';
+                            echo '<option value="' . htmlspecialchars($s[0]) . '" ' . $selected . '>Saison ' . htmlspecialchars($s[1]) . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sw_liga_id">Liga:</label>
+                <select id="sw_liga_id" name="sw_liga_id" class="form-control">
+                    <option value="">-- Zuerst Saison wählen --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sw_spieltag">Spieltag (Nummer):</label>
+                <input type="number" id="sw_spieltag" name="sw_spieltag" class="form-control" min="1" max="50"
+                    placeholder="z.B. 4" value="<?= htmlspecialchars($news['sw_spieltag'] ?? '') ?>">
+            </div>
+        </div>
+
         <div class="file-upload-box">
             <label for="bilder">Weitere Bilder hinzufügen:</label>
             <input type="file" id="bilder" name="bilder[]" multiple accept=".jpg, .jpeg, .png, .webp"
@@ -87,22 +160,25 @@ require_once __DIR__ . '/../../../templates/navigation.php';
                         <div class="admin-image-actions">
                             <?php if ($bild['is_deleted']): ?>
                                 <?php if ($canNewsDeleteHard): // Nur wer endgültig löschen darf, darf auch wiederherstellen ?>
-                                    <a href="bild_aktion.php?action=restore&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>" class="btn-restore" title="Wiederherstellen" style="margin-right: 10px;">
+                                    <a href="bild_aktion.php?action=restore&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>"
+                                        class="btn-restore" title="Wiederherstellen" style="margin-right: 10px;">
                                         <i class="fas fa-undo"></i>
                                     </a>
-                                    <a href="bild_aktion.php?action=hard_delete&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>" class="btn-delete" title="Endgültig löschen" onclick="return confirm('Bild wirklich ENDGÜLTIG vom Server löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.');">
+                                    <a href="bild_aktion.php?action=hard_delete&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>"
+                                        class="btn-delete" title="Endgültig löschen"
+                                        onclick="return confirm('Bild wirklich ENDGÜLTIG vom Server löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.');">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 <?php endif; ?>
-                                <?php else: ?>
-                                    <?php if ($canNewsDelete): ?>
-                                        <a href="bild_aktion.php?action=delete&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>"
-                                            class="btn-delete" title="Löschen"
-                                            onclick="return confirm('Bild archivieren? Es kann später wiederhergestellt werden.')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    <?php endif; ?>
+                            <?php else: ?>
+                                <?php if ($canNewsDelete): ?>
+                                    <a href="bild_aktion.php?action=delete&bild_id=<?= $bild['id'] ?>&news_id=<?= $id ?>"
+                                        class="btn-delete" title="Löschen"
+                                        onclick="return confirm('Bild archivieren? Es kann später wiederhergestellt werden.')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 <?php endif; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -119,6 +195,52 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             height: 300,
             language: 'de',
             versionCheck: false
+        });
+
+        // JavaScript für die Sportwinner-Felder
+        function toggleSpielberichtFields() {
+            var cb = document.getElementById('is_spielbericht');
+            var fields = document.getElementById('spielbericht_fields');
+            fields.style.display = cb.checked ? 'block' : 'none';
+        }
+
+        function loadLigen(preselectLigaId = null) {
+            var saisonId = document.getElementById('sw_saison_id').value;
+            var ligaSelect = document.getElementById('sw_liga_id');
+            ligaSelect.innerHTML = '<option value="">Lade Ligen...</option>';
+
+            if (!saisonId) {
+                ligaSelect.innerHTML = '<option value="">-- Zuerst Saison wählen --</option>';
+                return;
+            }
+
+            fetch('bearbeiten.php?ajax=get_ligen&saison_id=' + saisonId)
+                .then(response => response.json())
+                .then(data => {
+                    ligaSelect.innerHTML = '<option value="">-- Liga wählen --</option>';
+                    if (Array.isArray(data)) {
+                        data.forEach(function (liga) {
+                            var opt = document.createElement('option');
+                            opt.value = liga[0];
+                            opt.textContent = liga[2];
+                            if (preselectLigaId && preselectLigaId == liga[0]) {
+                                opt.selected = true;
+                            }
+                            ligaSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => {
+                    ligaSelect.innerHTML = '<option value="">Fehler beim Laden</option>';
+                });
+        }
+
+        // Beim Laden die gespeicherte Liga wiederherstellen
+        document.addEventListener('DOMContentLoaded', function () {
+            var savedLigaId = "<?= htmlspecialchars($news['sw_liga_id'] ?? '') ?>";
+            if (document.getElementById('sw_saison_id').value !== "") {
+                loadLigen(savedLigaId);
+            }
         });
     </script>
 </main>

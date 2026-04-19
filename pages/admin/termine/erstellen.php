@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $treffpunkt_zeit = setNullIfEmpty($_POST['treffpunkt_zeit'] ?? null);
     $treffpunkt_ort = setNullIfEmpty($_POST['treffpunkt_ort'] ?? null);
 
+    $sw_spieltag = (int) ($_POST['sw_spieltag'] ?? 0);
+
     // Kader (S1-S6, A1-A3, Spielführer)
     $s1 = setNullIfEmpty($_POST['s1'] ?? null);
     $s2 = setNullIfEmpty($_POST['s2'] ?? null);
@@ -63,9 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $sql = "INSERT INTO termine 
-                    (typ, titel, veranstaltungsart, termin_datum, uhrzeit, treffpunkt_zeit, treffpunkt_ort, heimspiel, gegner_id, ort, beschreibung, s1, s2, s3, s4, s5, s6, a1, a2, a3, spielfuehrer_id) 
+                    (typ, titel, veranstaltungsart, termin_datum, uhrzeit, treffpunkt_zeit, treffpunkt_ort, heimspiel, gegner_id, ort, beschreibung, s1, s2, s3, s4, s5, s6, a1, a2, a3, spielfuehrer_id, sw_spieltag) 
                     VALUES 
-                    (:typ, :titel, :veranstaltungsart, :termin_datum, :uhrzeit, :treffpunkt_zeit, :treffpunkt_ort, :heimspiel, :gegner_id, :ort, :beschreibung, :s1, :s2, :s3, :s4, :s5, :s6, :a1, :a2, :a3, :spielfuehrer_id)";
+                    (:typ, :titel, :veranstaltungsart, :termin_datum, :uhrzeit, :treffpunkt_zeit, :treffpunkt_ort, :heimspiel, :gegner_id, :ort, :beschreibung, :s1, :s2, :s3, :s4, :s5, :s6, :a1, :a2, :a3, :spielfuehrer_id, :sw_spieltag)";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
@@ -89,7 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':a1' => $a1,
                 ':a2' => $a2,
                 ':a3' => $a3,
-                ':spielfuehrer_id' => $spielfuehrer_id
+                ':spielfuehrer_id' => $spielfuehrer_id,
+                ':sw_spieltag' => $sw_spieltag
             ]);
 
             header("Location: uebersicht.php?success=1");
@@ -167,6 +170,14 @@ require_once __DIR__ . '/../../../templates/navigation.php';
         <div id="bereich-spiel"
             style="background: #fdf8f5; border-left: 4px solid #e67e22; padding: 15px; margin-top: 20px; border-radius: 5px;">
             <h3 style="margin-top: 0; color: #e67e22;"><i class="fa-solid fa-trophy"></i> Spiel-Details</h3>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="sw_spieltag">Spieltag (Nummer) für Liveview & News</label>
+                <input type="number" id="sw_spieltag" name="sw_spieltag" class="form-control" min="0" max="50"
+                    placeholder="z.B. 17">
+                <small style="color: #666;">Trage hier die Spieltags-Nummer (z.B. 17) ein, um den Liveview an diesem Tag
+                    zu aktivieren.</small>
+            </div>
 
             <div class="form-group">
                 <label for="gegner_id">Gegner Mannschaft</label>

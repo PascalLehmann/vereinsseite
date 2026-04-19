@@ -111,6 +111,10 @@ require_once __DIR__ . '/../../templates/navigation.php';
                         <i class="fas fa-sitemap"></i>
                         <span>Positionen verwalten</span>
                     </a>
+                    <a href="tabelle_config.php" class="dashboard-tile">
+                        <i class="fas fa-table"></i>
+                        <span>Tabelle einstellen</span>
+                    </a>
                     <a href="rollen/uebersicht.php" class="dashboard-tile">
                         <i class="fas fa-user-shield"></i>
                         <span>Rollenverwaltung</span>

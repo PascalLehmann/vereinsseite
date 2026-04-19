@@ -1,5 +1,38 @@
 <?php
 session_start();
+
+// --- GEMEINSAME SPORTWINNER API FUNKTION ---
+if (!function_exists('fetchSportwinnerAPI')) {
+    function fetchSportwinnerAPI($params)
+    {
+        $apiUrl = 'https://blbk.sportwinner.de/php/blbk/service.php';
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n" .
+                    "Accept: application/json, text/javascript, */*; q=0.01\r\n" .
+                    "X-Requested-With: XMLHttpRequest\r\n" .
+                    "Referer: https://blbk.sportwinner.de/\r\n" .
+                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n",
+                'content' => http_build_query($params)
+            ],
+            'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+        ];
+        $context = stream_context_create($options);
+        $json = @file_get_contents($apiUrl, false, $context);
+        return $json ? json_decode($json, true) : [];
+    }
+}
+
+// --- PROXY FÜR AJAX LIGEN-ABRUF (MUSS GANZ OBEN STEHEN) ---
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'get_ligen') {
+    require_once __DIR__ . '/../../../db.php';
+    $saison_id = $_GET['saison_id'] ?? '';
+    header('Content-Type: application/json');
+    echo json_encode(fetchSportwinnerAPI(['command' => 'GetLigaArray', 'id_saison' => $saison_id, 'id_bezirk' => 0, 'art' => 1, 'favorit' => '']));
+    exit;
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -27,6 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $inhalt = trim($_POST['inhalt'] ?? '');
     $autor_id = $_SESSION['user_id']; // Wer ist gerade eingeloggt?
 
+    $is_spielbericht = isset($_POST['is_spielbericht']) ? 1 : 0;
+    $sw_saison_id = $_POST['sw_saison_id'] ?? null;
+    $sw_liga_id = $_POST['sw_liga_id'] ?? null;
+    $sw_spieltag = !empty($_POST['sw_spieltag']) ? (int) $_POST['sw_spieltag'] : null;
+
     if (empty($titel) || empty($inhalt)) {
         $error = "Titel und Inhalt dürfen nicht leer sein.";
     } else {
@@ -35,12 +73,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
 
             // A) Die News in die Haupttabelle einfügen
-            $sqlNews = "INSERT INTO news (titel, inhalt, autor_id) VALUES (:titel, :inhalt, :autor_id)";
+            $sqlNews = "INSERT INTO news (titel, inhalt, autor_id, is_spielbericht, sw_saison_id, sw_liga_id, sw_spieltag) 
+                        VALUES (:titel, :inhalt, :autor_id, :is_spielbericht, :sw_saison_id, :sw_liga_id, :sw_spieltag)";
             $stmtNews = $pdo->prepare($sqlNews);
             $stmtNews->execute([
                 ':titel' => $titel,
                 ':inhalt' => $inhalt,
-                ':autor_id' => $autor_id
+                ':autor_id' => $autor_id,
+                ':is_spielbericht' => $is_spielbericht,
+                ':sw_saison_id' => $sw_saison_id,
+                ':sw_liga_id' => $sw_liga_id,
+                ':sw_spieltag' => $sw_spieltag
             ]);
 
             // Den "Pointer" (die ID) des neu erstellten Eintrags holen
@@ -152,6 +195,46 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             <textarea id="inhalt" name="inhalt" rows="8" class="form-control"></textarea>
         </div>
 
+        <!-- NEU: SPORTWINNER SPIELTAG KOPPLUNG -->
+        <div class="form-group">
+            <label
+                style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; padding: 10px; background: #eef2f5; border-radius: 5px;">
+                <input type="checkbox" id="is_spielbericht" name="is_spielbericht" value="1"
+                    onchange="toggleSpielberichtFields()" style="width: 20px; height: 20px;">
+                News ist ein Spielbericht (Ergebnisse von Sportwinner laden)
+            </label>
+        </div>
+
+        <div id="spielbericht_fields"
+            style="display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #ccc;">
+            <div class="form-group">
+                <label for="sw_saison_id">Saison:</label>
+                <select id="sw_saison_id" name="sw_saison_id" class="form-control" onchange="loadLigen()">
+                    <?php
+                    $saisons = fetchSportwinnerAPI(['command' => 'GetSaisonArray']);
+                    if (is_array($saisons)) {
+                        $first = true;
+                        foreach ($saisons as $s) {
+                            echo '<option value="' . htmlspecialchars($s[0]) . '" ' . ($first ? 'selected' : '') . '>Saison ' . htmlspecialchars($s[1]) . '</option>';
+                            $first = false;
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sw_liga_id">Liga:</label>
+                <select id="sw_liga_id" name="sw_liga_id" class="form-control">
+                    <option value="">-- Zuerst Saison wählen --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sw_spieltag">Spieltag (Nummer):</label>
+                <input type="number" id="sw_spieltag" name="sw_spieltag" class="form-control" min="1" max="50"
+                    placeholder="z.B. 4">
+            </div>
+        </div>
+
         <div class="file-upload-box">
             <label for="bilder">Bilder hinzufügen (Optional):</label>
             <input type="file" id="bilder" name="bilder[]" multiple accept=".jpg, .jpeg, .png, .webp"
@@ -168,6 +251,48 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             height: 300,
             language: 'de',
             versionCheck: false
+        });
+
+        // NEU: JavaScript für die Sportwinner-Felder
+        function toggleSpielberichtFields() {
+            var cb = document.getElementById('is_spielbericht');
+            var fields = document.getElementById('spielbericht_fields');
+            fields.style.display = cb.checked ? 'block' : 'none';
+        }
+
+        function loadLigen() {
+            var saisonId = document.getElementById('sw_saison_id').value;
+            var ligaSelect = document.getElementById('sw_liga_id');
+            ligaSelect.innerHTML = '<option value="">Lade Ligen...</option>';
+
+            if (!saisonId) {
+                ligaSelect.innerHTML = '<option value="">-- Zuerst Saison wählen --</option>';
+                return;
+            }
+
+            fetch('erstellen.php?ajax=get_ligen&saison_id=' + saisonId)
+                .then(response => response.json())
+                .then(data => {
+                    ligaSelect.innerHTML = '<option value="">-- Liga wählen --</option>';
+                    if (Array.isArray(data)) {
+                        data.forEach(function (liga) {
+                            var opt = document.createElement('option');
+                            opt.value = liga[0];
+                            opt.textContent = liga[2]; // Index 2 ist der Liga-Name
+                            ligaSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => {
+                    ligaSelect.innerHTML = '<option value="">Fehler beim Laden</option>';
+                });
+        }
+
+        // Beim Laden der Seite direkt die Ligen der vorausgewählten Saison abrufen
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('sw_saison_id').value !== "") {
+                loadLigen();
+            }
         });
     </script>
 </main>

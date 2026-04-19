@@ -100,6 +100,12 @@ require_once __DIR__ . '/../../../templates/navigation.php';
             style="background: #fdf8f5; border-left: 4px solid #e67e22; padding: 15px; margin-top: 20px; border-radius: 5px;">
             <h3 style="margin-top: 0; color: #e67e22;"><i class="fa-solid fa-trophy"></i> Spiel-Details</h3>
 
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="sw_spieltag">Spieltag (Nummer) für Liveview & News</label>
+                <input type="number" id="sw_spieltag" name="sw_spieltag" class="form-control" min="0" max="50" placeholder="z.B. 17" value="<?= htmlspecialchars($t['sw_spieltag'] ?? '') ?>">
+                <small style="color: #666;">Trage hier die Spieltags-Nummer (z.B. 17) ein, um den Liveview an diesem Tag zu aktivieren.</small>
+            </div>
+
             <div class="form-group">
                 <label for="gegner_id">Gegner Mannschaft</label>
                 <select id="gegner_id" name="gegner_id" class="form-control select2-box" style="width: 100%;">

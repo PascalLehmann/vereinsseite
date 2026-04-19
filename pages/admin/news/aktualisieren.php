@@ -23,6 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $inhalt = trim($_POST['inhalt'] ?? '');
 
+    $is_spielbericht = isset($_POST['is_spielbericht']) ? 1 : 0;
+    $sw_saison_id = $_POST['sw_saison_id'] ?? null;
+    $sw_liga_id = $_POST['sw_liga_id'] ?? null;
+    $sw_spieltag = !empty($_POST['sw_spieltag']) ? (int) $_POST['sw_spieltag'] : null;
+
     if (empty($titel) || empty($inhalt)) {
         die("Titel und Inhalt dürfen nicht leer sein.");
     }
@@ -31,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // ATOMARE TRANSAKTION STARTEN
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare("UPDATE news SET titel = ?, inhalt = ? WHERE id = ?");
-        $stmt->execute([$titel, $inhalt, $id]);
+        $stmt = $pdo->prepare("UPDATE news SET titel = ?, inhalt = ?, is_spielbericht = ?, sw_saison_id = ?, sw_liga_id = ?, sw_spieltag = ? WHERE id = ?");
+        $stmt->execute([$titel, $inhalt, $is_spielbericht, $sw_saison_id, $sw_liga_id, $sw_spieltag, $id]);
 
         // Sicheren Bildupload wie in erstellen.php verarbeiten
         if (isset($_FILES['bilder']) && $_FILES['bilder']['error'][0] !== UPLOAD_ERR_NO_FILE) {

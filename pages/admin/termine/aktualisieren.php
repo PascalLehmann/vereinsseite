@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         veranstaltungsart = :veranstaltungsart, beschreibung = :beschreibung, ort = :ort, 
         gegner_id = :gegner_id, heimspiel = :heimspiel, treffpunkt_zeit = :treffpunkt_zeit, treffpunkt_ort = :treffpunkt_ort, spielfuehrer_id = :spielfuehrer_id, 
         s1 = :s1, s2 = :s2, s3 = :s3, s4 = :s4, s5 = :s5, s6 = :s6, 
-        a1 = :a1, a2 = :a2, a3 = :a3
+        a1 = :a1, a2 = :a2, a3 = :a3,
+        sw_spieltag = :sw_spieltag
         WHERE id = :id";
 
     $stmt = $pdo->prepare($sql);
@@ -59,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':a1' => setNullIfEmpty($_POST['a1'] ?? null),
         ':a2' => setNullIfEmpty($_POST['a2'] ?? null),
         ':a3' => setNullIfEmpty($_POST['a3'] ?? null),
+        ':sw_spieltag' => (int) ($_POST['sw_spieltag'] ?? 0),
         ':id' => (int) $_POST['id']
     ]);
 

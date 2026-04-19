@@ -228,6 +228,49 @@ details.dropdown-menu ul {
 }
 
 /* =========================================
+   CKEDITOR FORMATIERUNGEN WIEDERHERSTELLEN
+   ========================================= */
+.news-content {
+    line-height: 1.6;
+    color: #333;
+}
+
+.news-content p {
+    margin-bottom: 15px;
+}
+
+.news-content ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.news-content ol {
+    list-style-type: decimal;
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.news-content strong, .news-content b {
+    font-weight: bold;
+}
+
+.news-content em, .news-content i {
+    font-style: italic;
+}
+
+.news-content h2, .news-content h3, .news-content h4 {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    color: var(--sidebar-color);
+}
+
+.news-content a {
+    color: var(--sidebar-color);
+    text-decoration: underline;
+}
+
+/* =========================================
    GLOBALE 3D KACHELN (Cards)
    ========================================= */
 .content-tile {
